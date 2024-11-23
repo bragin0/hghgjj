@@ -1,0 +1,295 @@
+body {
+    font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Apple Color Emoji", "Segoe UI", Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 75vh;
+    background-color: #212121;
+  }
+
+  .container {
+    max-width: 400px;
+    width: 100%;
+    background-color: #212121;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+  }
+
+  h1 {
+    margin-top: 22px;
+    margin-bottom: 5px;
+    font-size: 1.20rem;
+    color: white;
+  }
+
+  .logo {
+    display: block;
+    margin: 0 auto 25px auto;
+    width: 120px; /* Уменьшили размер логотипа */
+    height: auto;
+  }
+
+  .note {
+    font-size: 0.88rem;
+    color: #aaa; /* Цвет текста, который вы хотите */
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 39px;
+  }
+
+  .input-group {
+    margin-bottom: 20px;
+    position: relative;
+    text-align: left;
+  }
+
+  .input-group label {
+    position: absolute;
+    top: -10%;
+    left: 7px;
+    transform: translateY(-50%);
+    font-size: 0.74rem;
+    color: #aaa;
+    pointer-events: none;
+    background-color: #212121;
+    padding: 0 .23rem;
+  }
+
+  .input-group input {
+    width: 100%;
+    padding: 14px 14px 14px 15px;
+    font-size: 1rem;
+    background-color: #212121;
+    color: #eee;
+    border: 2px solid #444;
+    border-radius: 11px;
+    box-sizing: border-box;
+  }
+
+  .phone-code-selector {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 14px 14px 15px;
+    font-size: 1rem;
+    background-color: #212121;
+    color: #eee;
+    border: 2px solid #444;
+    border-radius: 11px;
+    cursor: pointer;
+  }
+
+
+  .menu-container {
+    position: absolute;
+    background-color: #212121;
+    width: 100%;
+    top: 100%;
+    left: 0;
+    border-radius: 8px;
+    box-shadow: 0 .25rem .5rem .125rem  rgb(0 0 0 / 36%);
+    display: none;
+    z-index: 10;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: 10px;
+    max-height: 23.5rem;
+  }
+
+#country-menu {
+  overflow: scroll;  /* Оставляет возможность прокрутки */
+}
+
+#country-menu::-webkit-scrollbar {
+  display: none;  /* Скрывает полосу прокрутки */
+}
+
+
+
+
+.input-group input[type="tel"]:focus {
+  border-color: #8774e1; /* Цвет рамки */
+  outline: none; /* Убираем стандартную обводку */
+}
+
+
+/* Плавный переход для изменения цвета текста метки */
+.input-group label {
+  transition: color 0.3s ease; /* Плавный переход цвета текста */
+}
+
+/* Изменяем цвет текста метки при фокусе на поле ввода */
+.input-group input[type="tel"]:focus + label {
+  color: #8774e1; /* Цвет текста метки */
+}
+
+.country-code {
+  color: #aaa;  /* Здесь можно задать любой цвет */
+  font-weight: bold;  /* Сделает текст жирным */
+}
+
+
+
+  .menu-item {
+    padding: 10px;
+    color: white;
+    cursor: pointer;
+  }
+
+  .menu-item:hover {
+    background-color: #444;
+  }
+
+.Checkbox-main span {
+margin-left: 1rem;
+}
+
+
+/* Стили для чекбокса */
+.Checkbox {
+display: flex;
+align-items: center;
+margin: 0 auto 25px 19px;
+color: white;
+font-family: 'Roboto', sans-serif;
+}
+
+.Checkbox input[type="checkbox"] {
+  margin-right: 10px;
+  pointer-events: none;
+  content: "";
+  display: block;
+  position: absolute;
+  left: 3rem;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.Checkbox input[type="checkbox"] {
+margin-right: 10px;
+pointer-events: none; /* Запрещаем взаимодействие с самим чекбоксом */
+content: "";
+display: block;
+position: absolute;
+left: 3rem;
+width: 1.25rem;
+height: 1.25rem;
+opacity: 0; /* Скрываем стандартный чекбокс */
+}
+
+/* Стиль для чекбокса перед его состоянием */
+.Checkbox .Checkbox-main {
+position: relative; /* Необходимо для правильного позиционирования псевдоэлементов */
+display: inline-block;
+}
+
+/* Стили для псевдоэлемента ::before - это будет видимый элемент чекбокса */
+.Checkbox .Checkbox-main::before {
+content: "";
+display: block;
+width: 1.25rem;
+height: 1.25rem;
+border: 0.125rem solid #5b5b5a; /* Светло-серая рамка */
+border-radius: 0.25rem; /* Скругленные углы */
+background-color: var(--color-background); /* Цвет фона чекбокса */
+transition: border-color 0.1s ease, background-color 0.1s ease; /* Плавный переход */
+}
+
+/* Когда чекбокс выбран (checked), изменяется цвет фона и рамки */
+.Checkbox input[type="checkbox"]:checked ~ .Checkbox-main::before {
+border-color: #8774e1; /* Цвет рамки при активации */
+background-color: #8774e1; /* Цвет фона при активации */
+}
+
+/* Добавляем галочку при checked */
+.Checkbox input[type="checkbox"]:checked ~ .Checkbox-main::after {
+content: "✓"; /* Символ галочки */
+display: block;
+position: absolute;
+left: 0.3rem; /* Позиционируем галочку внутри чекбокса */
+font-size: 1.1rem; /* Размер галочки */
+color: white; /* Цвет галочки */
+}
+
+
+.Checkbox .Checkbox-main {
+display: flex;
+align-items: center;
+}
+
+.Checkbox .label {
+font-size: 14px;
+color: #333; /* Цвет текста */
+}
+
+.Checkbox input[type="checkbox"]:checked + .Checkbox-main .label {
+color: #8774e1; /* Цвет текста при активном чекбоксе */
+}
+
+
+/* Стили для фокуса на родителе .input-group при фокусе на .phone-code-selector */
+.input-group:focus-within .phone-code-selector {
+border-color: #8774e1; /* Цвет рамки */
+}
+
+/* Плавный переход для изменения цвета текста метки */
+.input-group label {
+transition: color 0.3s ease; /* Плавный переход цвета текста */
+}
+
+/* Изменяем цвет текста метки при фокусе на .phone-code-selector */
+.input-group:focus-within label {
+color: #8774e1; /* Цвет текста метки */
+}
+
+
+
+.menu-item {
+display: flex;
+align-items: center;
+justify-content: flex-start;
+}
+
+a {
+text-decoration: none;
+}
+
+.flag {
+font-size: 20px; /* Размер флага */
+}
+
+.country-name {
+margin-left: 10px; /* Отступ от флага */
+font-size: 14px; /* Размер шрифта для названия */
+font-weight: bold;
+}
+
+.country-code {
+margin-left: auto; /* Сдвигает код на правый край */
+font-size: 14px; /* Размер шрифта для кода */
+}
+
+
+.Button {
+  outline: none !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 3.5rem;
+  border: 0;
+  border-radius: 12px;
+  line-height: 1.2;
+  position: relative;
+  overflow: hidden;
+  transition: background-color .15s, color .15s;
+  text-decoration: none !important;
+  text-transform: uppercase;
+  margin-top: 2.75rem;
+  background-color: #8774e1;
+  color: #ffffff;
+  font-weight: 600;
+}
