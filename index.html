@@ -8,6 +8,7 @@
         body {
             background-color: #292929; /* Серый фон */
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
@@ -19,12 +20,20 @@
             color: white;
             text-transform: uppercase;
             font-size: 36px;
+            margin-bottom: 20px;
+        }
+        .image-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            max-width: 600px; /* Ограничиваем максимальную ширину */
+            margin-top: 20px; /* Отступ сверху */
         }
         .image-container img {
-            width: 50%; /* Фиксированное изменение размера на 50% */
+            width: 100%; /* Изображение растягивается на всю ширину контейнера */
             height: auto;
             border: 2px solid #fff;
-            margin-top: 20px;
         }
     </style>
 </head>
