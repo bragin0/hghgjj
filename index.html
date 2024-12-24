@@ -66,11 +66,12 @@
         <h1>Полноэкранный режим в Telegram</h1>
         <p>Приложение запускается сразу в полноэкранном режиме.</p>
         <div class="input-container">
-            <input type="text" placeholder="Введите сообщение...">
-            <button>Отправить</button>
+            <input type="text" id="messageInput" placeholder="Введите сообщение...">
+            <button id="sendButton">Отправить</button>
         </div>
     </div>
 
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
         // Функция для запроса полноэкранного режима
         function requestFullscreen() {
@@ -85,16 +86,30 @@
             }
         }
 
-        // Попытаться перейти в полноэкранный режим при загрузке страницы
         window.addEventListener('load', function() {
-            // Для Telegram Webview
-            if (window.TelegramWebviewProxy) {
-                const data = JSON.stringify({});
-                window.TelegramWebviewProxy.postEvent('web_app_request_fullscreen', data);
-            } else {
-                // Для обычных браузеров
-                requestFullscreen();
-            }
+            const tg = window.Telegram.WebApp;
+
+            // Расширение на весь экран
+            tg.expand();
+
+            // Попытка перейти в полноэкранный режим для обычных браузеров
+            requestFullscreen();
+
+            // Обработчик нажатия кнопки "Отправить"
+            const sendButton = document.getElementById('sendButton');
+            const messageInput = document.getElementById('messageInput');
+
+            sendButton.addEventListener('click', function() {
+                const message = messageInput.value.trim();
+                if (message) {
+                    // Отправка данных в бота
+                    tg.sendData(message);
+                    alert('Ваше сообщение отправлено!');
+                    messageInput.value = ''; // Очистить поле ввода
+                } else {
+                    alert('Пожалуйста, введите текст сообщения.');
+                }
+            });
         });
 
         // Обработчик событий для изменения состояния полноэкранного режима
