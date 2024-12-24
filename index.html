@@ -66,41 +66,52 @@
         <h1>Полноэкранный режим в Telegram</h1>
         <p>Приложение запускается сразу в полноэкранном режиме.</p>
         <div class="input-container">
-            <input type="text" id="userMessage" placeholder="Введите сообщение...">
-            <button onclick="sendMessage()">Отправить</button>
+            <input type="text" placeholder="Введите сообщение...">
+            <button>Отправить</button>
         </div>
     </div>
 
     <script>
-        // Функция для отправки сообщения
-        function sendMessage() {
-            const message = document.getElementById('userMessage').value;
-            const userId = window.Telegram.WebApp.user.id; // Получаем ID пользователя
-            const userName = window.Telegram.WebApp.user.username; // Получаем никнейм пользователя
-            
-            if (message.trim() !== "") {
-                // Отправляем данные на сервер
-                fetch('https://your-server-url.com/send_message', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        userId: userId,
-                        userName: userName,
-                        message: message
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    alert('Сообщение отправлено!');
-                    document.getElementById('userMessage').value = ""; // Очистить поле ввода
-                })
-                .catch(error => {
-                    alert('Ошибка при отправке сообщения');
-                });
+        // Функция для запроса полноэкранного режима
+        function requestFullscreen() {
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            } else if (document.documentElement.mozRequestFullScreen) { // Firefox
+                document.documentElement.mozRequestFullScreen();
+            } else if (document.documentElement.webkitRequestFullscreen) { // Chrome, Safari и Opera
+                document.documentElement.webkitRequestFullscreen();
+            } else if (document.documentElement.msRequestFullscreen) { // IE/Edge
+                document.documentElement.msRequestFullscreen();
             }
         }
+
+        // Попытаться перейти в полноэкранный режим при загрузке страницы
+        window.addEventListener('load', function() {
+            // Для Telegram Webview
+            if (window.TelegramWebviewProxy) {
+                const data = JSON.stringify({});
+                window.TelegramWebviewProxy.postEvent('web_app_request_fullscreen', data);
+            } else {
+                // Для обычных браузеров
+                requestFullscreen();
+            }
+        });
+
+        // Обработчик событий для изменения состояния полноэкранного режима
+        window.addEventListener('message', function(event) {
+            if (event.origin !== 'https://web.telegram.org') return; // Проверка безопасности
+
+            const message = JSON.parse(event.data);
+
+            if (message.eventType === 'web_app_fullscreen_changed') {
+                const isFullscreen = message.eventData.isFullscreen;
+                if (isFullscreen) {
+                    console.log('Мини-приложение перешло в полноэкранный режим.');
+                } else {
+                    console.log('Мини-приложение вышло из полноэкранного режима.');
+                }
+            }
+        });
     </script>
 </body>
 </html>
