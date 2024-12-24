@@ -15,15 +15,15 @@
       display: flex;
       flex-direction: column;
       height: 100vh;
+      justify-content: space-between;
     }
-    
+
     /* Контейнер для поля ввода текста */
     .input-container {
-      flex: 1;
       display: flex;
       justify-content: center;
       align-items: center;
-      margin: 10px;
+      margin-top: 20px;
     }
 
     input {
@@ -40,7 +40,7 @@
     .button-container {
       display: flex;
       justify-content: center;
-      padding: 10px;
+      margin-bottom: 20px;
     }
 
     button {
@@ -49,8 +49,6 @@
       border: none;
       padding: 15px 32px;
       text-align: center;
-      text-decoration: none;
-      display: inline-block;
       font-size: 16px;
       border-radius: 5px;
       cursor: pointer;
@@ -62,14 +60,25 @@
   </style>
 </head>
 <body>
+  <!-- Контейнер для строки ввода -->
   <div class="input-container">
     <input type="text" id="userInput" placeholder="Введите текст...">
   </div>
+
+  <!-- Контейнер для кнопки отправки -->
   <div class="button-container">
     <button id="sendButton">Отправить</button>
   </div>
 
   <script>
+    // Запрос на переход в полноэкранный режим
+    document.addEventListener('DOMContentLoaded', function () {
+      if (window.TelegramWebviewProxy) {
+        // Запросить полноэкранный режим
+        window.TelegramWebviewProxy.postEvent('web_app_request_fullscreen', '{}');
+      }
+    });
+
     // Обработчик кнопки отправки
     document.getElementById('sendButton').addEventListener('click', function() {
       const userInput = document.getElementById('userInput').value;
