@@ -14,18 +14,12 @@
       padding: 0;
       display: flex;
       flex-direction: column;
-      height: 100vh;
-      justify-content: space-between;
+      justify-content: center; /* Центрируем содержимое по вертикали */
+      align-items: center; /* Центрируем по горизонтали */
+      height: 100vh; /* Высота экрана */
     }
 
     /* Контейнер для поля ввода текста */
-    .input-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-top: 20px;
-    }
-
     input {
       width: 80%;
       padding: 10px;
@@ -34,15 +28,10 @@
       border: 1px solid #555;
       border-radius: 5px;
       font-size: 16px;
+      margin-bottom: 20px; /* Отступ снизу для кнопки */
     }
 
     /* Контейнер для кнопки */
-    .button-container {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 20px;
-    }
-
     button {
       background-color: #4CAF50;
       color: white;
@@ -60,15 +49,11 @@
   </style>
 </head>
 <body>
-  <!-- Контейнер для строки ввода -->
-  <div class="input-container">
-    <input type="text" id="userInput" placeholder="Введите текст...">
-  </div>
+  <!-- Строка ввода -->
+  <input type="text" id="userInput" placeholder="Введите текст...">
 
-  <!-- Контейнер для кнопки отправки -->
-  <div class="button-container">
-    <button id="sendButton">Отправить</button>
-  </div>
+  <!-- Кнопка отправки -->
+  <button id="sendButton">Отправить</button>
 
   <script>
     // Запрос на переход в полноэкранный режим
