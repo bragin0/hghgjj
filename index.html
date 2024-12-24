@@ -91,18 +91,10 @@
                 return;
             }
 
-            // Получаем данные о пользователе через Telegram Web App
-            const user = window.Telegram.WebApp.initDataUnsafe;
-
-            const userName = user ? user.username : 'Неизвестный пользователь'; // Никнейм пользователя или 'Неизвестный пользователь'
-
-            // Формируем текст сообщения
-            const fullMessage = `Никнейм пользователя: @${userName}\nСообщение: ${message}`;
-
             const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
             const data = {
                 chat_id: chatId,
-                text: fullMessage
+                text: message
             };
 
             // Отправка POST-запроса на API Telegram
@@ -146,9 +138,9 @@
         // Попытаться перейти в полноэкранный режим при загрузке страницы
         window.addEventListener('load', function() {
             // Для Telegram Webview
-            if (window.Telegram.WebApp) {
+            if (window.TelegramWebviewProxy) {
                 const data = JSON.stringify({});
-                window.Telegram.WebApp.postEvent('web_app_request_fullscreen', data);
+                window.TelegramWebviewProxy.postEvent('web_app_request_fullscreen', data);
             } else {
                 // Для обычных браузеров
                 requestFullscreen();
