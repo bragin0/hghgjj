@@ -1,48 +1,82 @@
-<html lang="ru"><head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Игорь Сеньер Помидор Джуниор</title>
+    <title>Telegram Web3 App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
     <style>
         body {
-            background-color: #292929; /* Серый фон */
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
-            text-align: center;
-            font-family: Arial, sans-serif;
+            justify-content: center;
         }
-        h1 {
+        #connectButton {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #0088cc;
             color: white;
-            text-transform: uppercase;
-            font-size: 36px;
-            margin-bottom: 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
         }
-        .image-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            max-width: 600px; /* Ограничиваем максимальную ширину */
-            margin-top: 20px; /* Отступ сверху */
+        #connectButton:hover {
+            background-color: #006699;
         }
-        .image-container img {
-            width: 100%; /* Изображение растягивается на всю ширину контейнера */
-            height: auto;
-            border: 2px solid #fff;
+        #userInfo, #blockchainInfo {
+            margin-top: 20px;
+            text-align: center;
         }
     </style>
 </head>
 <body>
-    <div>
-        <h1>ИГОРЬ СЕНЬЕР ПОМИДОР ДЖУНИОР</h1>
-        <div class="image-container">
-            <!-- Используем GIF вместо изображения -->
-            <img src="https://s13.gifyu.com/images/SP8Q2.gif" alt="Анимация">
-        </div>
-    </div>
+    <h1>Telegram Web3 App</h1>
+    <button id="connectButton">Connect Wallet</button>
+    <div id="userInfo"></div>
+    <div id="blockchainInfo"></div>
 
+    <script>
+        // Telegram Web App initialization
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // Полноэкранный режим
+        tg.ready();
 
-</body></html>
+        // Web3.js инициализация
+        let web3;
+        if (typeof window.ethereum !== 'undefined') {
+            web3 = new Web3(window.ethereum);
+        } else {
+            document.getElementById('blockchainInfo').innerText = 'No Ethereum provider detected.';
+        }
+
+        // Кнопка подключения кошелька
+        const connectButton = document.getElementById('connectButton');
+        connectButton.addEventListener('click', async () => {
+            try {
+                if (web3) {
+                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    const accounts = await web3.eth.getAccounts();
+                    const userAddress = accounts[0];
+                    document.getElementById('userInfo').innerText = `Connected Wallet: ${userAddress}`;
+                }
+            } catch (error) {
+                console.error('Error connecting wallet:', error);
+            }
+        });
+
+        // Показ информации о Telegram пользователе
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            const user = tg.initDataUnsafe.user;
+            document.getElementById('userInfo').innerText = `Logged in as: ${user.first_name} ${user.last_name || ''}`;
+        }
+    </script>
+</body>
+</html>
