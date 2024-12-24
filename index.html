@@ -1,18 +1,57 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>Telegram Fullscreen Mini App</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Fullscreen App</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+        }
+
+        .content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
-    <div class="app-container">
-        <h1>Welcome to the Fullscreen Mini App!</h1>
-        <p>This is a test app for Telegram Web App fullscreen mode.</p>
-        <button id="fullscreenButton" style="display: none;">Exit Fullscreen</button>
+    <div class="content">
+        <h1>Привет! Это полноэкранное приложение.</h1>
+        <p>Данное приложение сразу откроется в полноэкранном режиме.</p>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        // Функция для перехода в полноэкранный режим
+        function enterFullscreen() {
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            } else if (document.documentElement.mozRequestFullScreen) { // Firefox
+                document.documentElement.mozRequestFullScreen();
+            } else if (document.documentElement.webkitRequestFullscreen) { // Chrome, Safari и Opera
+                document.documentElement.webkitRequestFullscreen();
+            } else if (document.documentElement.msRequestFullscreen) { // IE/Edge
+                document.documentElement.msRequestFullscreen();
+            }
+        }
+
+        // Попытка перейти в полноэкранный режим, как только страница загружена
+        window.onload = function() {
+            setTimeout(enterFullscreen, 500); // Задержка для корректного запуска в некоторых браузерах
+        };
+    </script>
 </body>
 </html>
