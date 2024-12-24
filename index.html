@@ -3,106 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Полноэкранное приложение Telegram</title>
+    <title>Telegram Mini App Fullscreen</title>
     <style>
         body {
             margin: 0;
-            height: 100vh;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #000000;
-        }
-
-        .content {
-            display: flex;
-            justify-content: center;
-            align-items: center;
             flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #121212;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
             text-align: center;
-            width: 100%;
-            max-width: 600px;
         }
 
         h1 {
-            font-size: 2rem;
             margin-bottom: 20px;
-            color: white;
-        }
-
-        .input-container {
-            display: flex;
-            align-items: center;
-            width: 100%;
-            max-width: 600px;
-        }
-
-        input[type="text"] {
-            padding: 10px;
-            font-size: 1rem;
-            width: 80%;
-            border-radius: 5px;
-            border: 1px solid #ccc;
         }
 
         button {
             padding: 10px 20px;
-            font-size: 1rem;
-            margin-left: 10px;
-            border-radius: 5px;
-            border: none;
-            background-color: #4CAF50;
+            font-size: 16px;
+            background-color: #0088cc;
             color: white;
+            border: none;
+            border-radius: 5px;
             cursor: pointer;
         }
 
         button:hover {
-            background-color: #45a049;
+            background-color: #005f99;
         }
     </style>
 </head>
 <body>
-    <div class="content">
-        <h1>Полноэкранный режим в Telegram</h1>
-        <p>Приложение запускается сразу в полноэкранном режиме.</p>
-        <div class="input-container">
-            <input type="text" id="messageInput" placeholder="Введите сообщение...">
-            <button id="sendButton">Отправить</button>
-        </div>
-    </div>
+    <h1>Полноэкранный режим Telegram</h1>
+    <p>Нажмите кнопку ниже, чтобы запросить полноэкранный режим.</p>
+    <button id="fullscreenBtn">Запросить полноэкранный режим</button>
 
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
-        window.addEventListener('load', function () {
-            const tg = window.Telegram.WebApp;
-
-            // Расширить приложение на весь экран Telegram
-            tg.expand();
-
-            // Проверить, расширено ли приложение
-            console.log("Приложение запущено:", tg.initDataUnsafe);
-
-            // Кнопка "Отправить"
-            const sendButton = document.getElementById('sendButton');
-            const messageInput = document.getElementById('messageInput');
-
-            sendButton.addEventListener('click', function () {
-                const message = messageInput.value.trim();
-                if (message) {
-                    // Отправить данные в Telegram
-                    tg.sendData(message);
-                    alert('Ваше сообщение отправлено!');
-                    messageInput.value = ''; // Очистить поле ввода
-                } else {
-                    alert('Пожалуйста, введите текст сообщения.');
-                }
+        // Функция для отправки сообщения родительскому iframe (Web версия)
+        function requestFullscreenWeb() {
+            const message = JSON.stringify({
+                eventType: 'web_app_request_fullscreen',
+                eventData: {}
             });
+            window.parent.postMessage(message, 'https://web.telegram.org');
+        }
 
-            // Обработка изменения состояния мини-приложения
-            tg.onEvent('viewportChanged', function () {
-                console.log("Изменение вида: приложение теперь полноэкранное?", tg.isExpanded);
-            });
+        // Функция для отправки запроса через Telegram Webview Proxy (Desktop/Mobile версия)
+        function requestFullscreenNative() {
+            if (window.TelegramWebviewProxy) {
+                window.TelegramWebviewProxy.postEvent('web_app_request_fullscreen', '{}');
+            } else {
+                alert('Telegram Webview Proxy не доступен.');
+            }
+        }
+
+        // Обработчик кнопки для вызова полноэкранного режима
+        document.getElementById('fullscreenBtn').addEventListener('click', function () {
+            if (window.parent) {
+                requestFullscreenWeb();
+            } else if (window.TelegramWebviewProxy) {
+                requestFullscreenNative();
+            } else {
+                alert('Полноэкранный режим не поддерживается.');
+            }
         });
+
+        // Уведомление о готовности приложения
+        function notifyAppReady() {
+            const message = JSON.stringify({
+                eventType: 'web_app_ready',
+                eventData: {}
+            });
+            window.parent.postMessage(message, 'https://web.telegram.org');
+        }
+
+        window.addEventListener('load', notifyAppReady);
     </script>
 </body>
 </html>
