@@ -11,7 +11,9 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #f0f0f0;
+            background-color: #000;
+            color: white;
+            font-family: Arial, sans-serif;
         }
 
         .content {
@@ -20,11 +22,47 @@
             align-items: center;
             flex-direction: column;
             text-align: center;
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
         }
 
         h1 {
             font-size: 2rem;
             margin-bottom: 20px;
+        }
+
+        .message-box {
+            display: flex;
+            width: 100%;
+            background-color: #333;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background-color: #333;
+            color: white;
+            font-size: 1rem;
+            border-radius: 20px 0 0 20px;
+            outline: none;
+        }
+
+        .send-button {
+            background-color: #0088cc;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            border-radius: 0 20px 20px 0;
+        }
+
+        .send-button:hover {
+            background-color: #0077b3;
         }
     </style>
 </head>
@@ -32,9 +70,58 @@
     <div class="content">
         <h1>Полноэкранный режим в Telegram</h1>
         <p>Приложение запускается сразу в полноэкранном режиме.</p>
+
+        <div class="message-box">
+            <input type="text" class="message-input" placeholder="Введите сообщение..." id="message-input">
+            <button class="send-button" onclick="sendMessage()">Отправить</button>
+        </div>
     </div>
 
     <script>
+        // Ваш токен Telegram-бота (полученный через BotFather)
+        const botToken = '7631015385:AAHSMU6rV3Kuwu42QAKOzTHeeHzROPrAzL0';
+        const chatId = '511301057'; // ID чата, куда будут отправляться сообщения
+
+        // Функция для отправки сообщения в Telegram
+        function sendMessage() {
+            const message = document.getElementById("message-input").value;
+
+            if (message.trim() === "") {
+                alert("Пожалуйста, введите сообщение.");
+                return;
+            }
+
+            const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+            const data = {
+                chat_id: chatId,
+                text: message
+            };
+
+            // Отправка POST-запроса на API Telegram
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.ok) {
+                    alert("Сообщение отправлено в Telegram!");
+                } else {
+                    alert("Ошибка при отправке сообщения.");
+                }
+            })
+            .catch(error => {
+                alert("Произошла ошибка при отправке.");
+                console.error("Error:", error);
+            });
+
+            // Очистка поля ввода
+            document.getElementById("message-input").value = "";
+        }
+
         // Функция для запроса полноэкранного режима
         function requestFullscreen() {
             if (document.documentElement.requestFullscreen) {
@@ -57,22 +144,6 @@
             } else {
                 // Для обычных браузеров
                 requestFullscreen();
-            }
-        });
-
-        // Обработчик событий для изменения состояния полноэкранного режима
-        window.addEventListener('message', function(event) {
-            if (event.origin !== 'https://web.telegram.org') return; // Проверка безопасности
-
-            const message = JSON.parse(event.data);
-
-            if (message.eventType === 'web_app_fullscreen_changed') {
-                const isFullscreen = message.eventData.isFullscreen;
-                if (isFullscreen) {
-                    console.log('Мини-приложение перешло в полноэкранный режим.');
-                } else {
-                    console.log('Мини-приложение вышло из полноэкранного режима.');
-                }
             }
         });
     </script>
