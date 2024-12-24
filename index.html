@@ -1,146 +1,99 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Полноэкранное приложение Telegram</title>
-    <style>
-        /* Устанавливаем черный фон для всего тела */
-        body {
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            background-color: #000;  /* Черный фон */
-            color: #fff;  /* Белый шрифт */
-            font-family: Arial, sans-serif;  /* Шрифт */
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Telegram Mini App</title>
+  <style>
+    /* Черный фон для всего приложения */
+    body {
+      background-color: black;
+      color: white;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    
+    /* Контейнер для поля ввода текста */
+    .input-container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 10px;
+    }
 
-        /* Стили для контента */
-        .content {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            text-align: center;
-            width: 100%;
-            max-width: 500px;
-            padding: 20px;
-            box-sizing: border-box;
-        }
+    input {
+      width: 80%;
+      padding: 10px;
+      background-color: #333;
+      color: white;
+      border: 1px solid #555;
+      border-radius: 5px;
+      font-size: 16px;
+    }
 
-        h1 {
-            font-size: 2rem;
-            margin-bottom: 20px;
-        }
+    /* Контейнер для кнопки */
+    .button-container {
+      display: flex;
+      justify-content: center;
+      padding: 10px;
+    }
 
-        p {
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-        }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 15px 32px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
 
-        /* Стили для строки ввода */
-        .input-container {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            margin-top: 20px;
-        }
-
-        input[type="text"] {
-            width: 80%;
-            padding: 10px;
-            background-color: #333;
-            border: 1px solid #555;
-            color: #fff;
-            font-size: 1rem;
-            border-radius: 5px;
-        }
-
-        button {
-            width: 15%;
-            padding: 10px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            font-size: 1rem;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: background-color 0.3s;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-    </style>
+    button:active {
+      background-color: #45a049;
+    }
+  </style>
 </head>
 <body>
-    <div class="content">
-        <h1>Полноэкранное приложение</h1>
-        <p>Приложение запускается сразу в полноэкранном режиме с черным фоном и белым шрифтом.</p>
+  <div class="input-container">
+    <input type="text" id="userInput" placeholder="Введите текст...">
+  </div>
+  <div class="button-container">
+    <button id="sendButton">Отправить</button>
+  </div>
 
-        <!-- Строка ввода сообщения -->
-        <div class="input-container">
-            <input type="text" id="messageInput" placeholder="Введите сообщение" />
-            <button onclick="sendMessage()">Отправить</button>
-        </div>
-    </div>
+  <script>
+    // Обработчик кнопки отправки
+    document.getElementById('sendButton').addEventListener('click', function() {
+      const userInput = document.getElementById('userInput').value;
 
-    <script>
-        // Функция для запроса полноэкранного режима
-        function requestFullscreen() {
-            if (document.documentElement.requestFullscreen) {
-                document.documentElement.requestFullscreen();
-            } else if (document.documentElement.mozRequestFullScreen) { // Firefox
-                document.documentElement.mozRequestFullScreen();
-            } else if (document.documentElement.webkitRequestFullscreen) { // Chrome, Safari и Opera
-                document.documentElement.webkitRequestFullscreen();
-            } else if (document.documentElement.msRequestFullscreen) { // IE/Edge
-                document.documentElement.msRequestFullscreen();
-            }
-        }
-
-        // Попытаться перейти в полноэкранный режим при загрузке страницы
-        window.addEventListener('load', function() {
-            // Для Telegram Webview
-            if (window.TelegramWebviewProxy) {
-                const data = JSON.stringify({});
-                window.TelegramWebviewProxy.postEvent('web_app_request_fullscreen', data);
-            } else {
-                // Для обычных браузеров
-                requestFullscreen();
-            }
+      // Отправляем данные в Telegram через Mini App
+      if (window.TelegramWebviewProxy) {
+        const data = JSON.stringify({
+          eventType: 'web_app_data_send',
+          eventData: { data: userInput }
         });
 
-        // Обработчик событий для изменения состояния полноэкранного режима
-        window.addEventListener('message', function(event) {
-            if (event.origin !== 'https://web.telegram.org') return; // Проверка безопасности
+        window.TelegramWebviewProxy.postEvent('web_app_data_send', data);
+      }
 
-            const message = JSON.parse(event.data);
+      // Очищаем поле ввода
+      document.getElementById('userInput').value = '';
+    });
 
-            if (message.eventType === 'web_app_fullscreen_changed') {
-                const isFullscreen = message.eventData.isFullscreen;
-                if (isFullscreen) {
-                    console.log('Мини-приложение перешло в полноэкранный режим.');
-                } else {
-                    console.log('Мини-приложение вышло из полноэкранного режима.');
-                }
-            }
-        });
-
-        // Функция для отправки сообщения
-        function sendMessage() {
-            const message = document.getElementById('messageInput').value;
-            if (message.trim() !== "") {
-                console.log('Сообщение отправлено:', message);
-                // Очистить поле ввода после отправки
-                document.getElementById('messageInput').value = "";
-            } else {
-                console.log('Введите сообщение.');
-            }
-        }
-    </script>
+    // Настройка кнопки назад для веб-версии Telegram
+    const data = JSON.stringify({
+      eventType: 'web_app_setup_back_button',
+      eventData: { is_visible: true }
+    });
+    window.parent.postMessage(data, 'https://web.telegram.org');
+  </script>
 </body>
 </html>
