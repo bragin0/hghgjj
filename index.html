@@ -1,39 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Отправка сообщения</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini App for Telegram Bot</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 10px;
+      background-color: #f5f5f5;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+    }
+  </style>
 </head>
 <body>
-    <h1>Отправьте сообщение админу</h1>
-    <textarea id="message" placeholder="Введите ваше сообщение" rows="5" cols="30"></textarea><br>
-    <button onclick="sendMessage()">Отправить</button>
+  <h2>Отправьте ваше сообщение администратору</h2>
+  <form id="message-form">
+    <input type="text" id="message" placeholder="Введите ваше сообщение..." required>
+    <button type="submit">Отправить</button>
+  </form>
 
-    <script>
-        // Получаем данные о пользователе
-        const user = Telegram.WebApp.initDataUnsafe.user;
-        const username = user.username || "Без имени";
-        const firstName = user.first_name || "Неизвестный";
-        const userId = user.id;
-
-        function sendMessage() {
-            const message = document.getElementById('message').value;
-
-            if (!message.trim()) {
-                alert("Введите сообщение перед отправкой!");
-                return;
-            }
-
-            // Формируем данные для отправки админу
-            const fullMessage = `Сообщение от ${firstName} (@${username}, ID: ${userId}):\n${message}`;
-            
-            // Отправляем данные в бота
-            Telegram.WebApp.sendData(fullMessage);
-        }
-
-        Telegram.WebApp.ready(); // Уведомление, что приложение загружено
-    </script>
+  <script>
+    const form = document.getElementById('message-form');
+    form.onsubmit = (e) => {
+      e.preventDefault();
+      const message = document.getElementById('message').value;
+      if (message) {
+        // Отправляем данные в Telegram с помощью Telegram WebApp API
+        Telegram.WebApp.sendData(message);
+      }
+    };
+  </script>
 </body>
 </html>
