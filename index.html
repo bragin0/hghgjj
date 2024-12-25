@@ -1,87 +1,39 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram Mini App Fullscreen</title>
-    <style>
-        body {
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #121212;
-            color: #ffffff;
-            font-family: Arial, sans-serif;
-            text-align: center;
-        }
-
-        h1 {
-            margin-bottom: 20px;
-        }
-
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #0088cc;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #005f99;
-        }
-    </style>
+    <title>Отправка сообщения</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-    <h1>Полноэкранный режим Telegram</h1>
-    <p>Нажмите кнопку ниже, чтобы запросить полноэкранный режим.</p>
-    <button id="fullscreenBtn">Запросить полноэкранный режим</button>
+    <h1>Отправьте сообщение админу</h1>
+    <textarea id="message" placeholder="Введите ваше сообщение" rows="5" cols="30"></textarea><br>
+    <button onclick="sendMessage()">Отправить</button>
 
     <script>
-        // Функция для отправки сообщения родительскому iframe (Web версия)
-        function requestFullscreenWeb() {
-            const message = JSON.stringify({
-                eventType: 'web_app_request_fullscreen',
-                eventData: {}
-            });
-            window.parent.postMessage(message, 'https://web.telegram.org');
-        }
+        // Получаем данные о пользователе
+        const user = Telegram.WebApp.initDataUnsafe.user;
+        const username = user.username || "Без имени";
+        const firstName = user.first_name || "Неизвестный";
+        const userId = user.id;
 
-        // Функция для отправки запроса через Telegram Webview Proxy (Desktop/Mobile версия)
-        function requestFullscreenNative() {
-            if (window.TelegramWebviewProxy) {
-                window.TelegramWebviewProxy.postEvent('web_app_request_fullscreen', '{}');
-            } else {
-                alert('Telegram Webview Proxy не доступен.');
+        function sendMessage() {
+            const message = document.getElementById('message').value;
+
+            if (!message.trim()) {
+                alert("Введите сообщение перед отправкой!");
+                return;
             }
+
+            // Формируем данные для отправки админу
+            const fullMessage = `Сообщение от ${firstName} (@${username}, ID: ${userId}):\n${message}`;
+            
+            // Отправляем данные в бота
+            Telegram.WebApp.sendData(fullMessage);
         }
 
-        // Обработчик кнопки для вызова полноэкранного режима
-        document.getElementById('fullscreenBtn').addEventListener('click', function () {
-            if (window.parent) {
-                requestFullscreenWeb();
-            } else if (window.TelegramWebviewProxy) {
-                requestFullscreenNative();
-            } else {
-                alert('Полноэкранный режим не поддерживается.');
-            }
-        });
-
-        // Уведомление о готовности приложения
-        function notifyAppReady() {
-            const message = JSON.stringify({
-                eventType: 'web_app_ready',
-                eventData: {}
-            });
-            window.parent.postMessage(message, 'https://web.telegram.org');
-        }
-
-        window.addEventListener('load', notifyAppReady);
+        Telegram.WebApp.ready(); // Уведомление, что приложение загружено
     </script>
 </body>
 </html>
