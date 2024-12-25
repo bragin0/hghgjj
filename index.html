@@ -71,14 +71,14 @@
           const text = `Ник: ${user.username}\nСообщение: ${message}`;
 
           // Отправляем запрос к API Telegram
-fetch(`https://api.telegram.org/bot7488318384:AAH2H0idqXmKoLzE7wJPRPd_Vp5S-5TkTDo/sendMessage`, {
+fetch("https://api.telegram.org/bot7488318384:AAH2H0idqXmKoLzE7wJPRPd_Vp5S-5TkTDo/sendMessage", {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
   },
   body: JSON.stringify({
-    chat_id: '511301057',  // Ваш chat_id (ID администратора или группы)
-    text: `Ник: ${user.username}\nСообщение: ${message}`,
+    chat_id: '511301057',
+    text: `Ник: ${user.username}\nСообщение: ${message}`
   }),
 }).then(response => {
   if (response.ok) {
@@ -86,18 +86,19 @@ fetch(`https://api.telegram.org/bot7488318384:AAH2H0idqXmKoLzE7wJPRPd_Vp5S-5TkTD
     statusDiv.className = 'status success';
   } else {
     response.text().then(text => {
-      console.log('Error response:', text);  // Логируем ошибку с серверной стороны
+      console.log('Ошибка ответа:', text);  // Логируем ошибку с серверной стороны
     });
     statusDiv.textContent = 'Ошибка при отправке сообщения.';
     statusDiv.className = 'status error';
   }
   statusDiv.style.display = 'block';
 }).catch((error) => {
-  console.log('Error:', error);  // Логируем ошибку на клиенте
+  console.log('Ошибка при отправке запроса:', error);  // Логируем ошибку на клиенте
   statusDiv.textContent = 'Ошибка при отправке сообщения.';
   statusDiv.className = 'status error';
   statusDiv.style.display = 'block';
 });
+
 
   </script>
 </body>
