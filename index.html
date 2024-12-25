@@ -52,20 +52,53 @@
     const form = document.getElementById('message-form');
     const statusDiv = document.getElementById('status');
 
+    // Получаем данные из WebApp
+    const user = Telegram.WebApp.initData;
+
     form.onsubmit = (e) => {
       e.preventDefault();
       const message = document.getElementById('message').value;
+
+      // Если сообщение не пустое, отправляем в бот
       if (message) {
         try {
-          // Отправляем данные в Telegram с помощью Telegram WebApp API
-          Telegram.WebApp.sendData(message);
-          statusDiv.textContent = 'Сообщение успешно отправлено!';
-          statusDiv.className = 'status success';
+          // Ваш токен бота
+          const botToken = '7488318384:AAH2H0idqXmKoLzE7wJPRPd_Vp5S-5TkTDo';
+          // Чат ID (можно использовать ID админа или группы)
+          const chatId = '511301057';
+
+          // Формируем текст для отправки в бота
+          const text = `Ник: ${user.username}\nСообщение: ${message}`;
+
+          // Отправляем запрос к API Telegram
+          fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              chat_id: chatId,
+              text: text,
+            }),
+          }).then(response => {
+            if (response.ok) {
+              statusDiv.textContent = 'Сообщение успешно отправлено!';
+              statusDiv.className = 'status success';
+            } else {
+              statusDiv.textContent = 'Ошибка при отправке сообщения.';
+              statusDiv.className = 'status error';
+            }
+            statusDiv.style.display = 'block';
+          }).catch((error) => {
+            statusDiv.textContent = 'Ошибка при отправке сообщения.';
+            statusDiv.className = 'status error';
+            statusDiv.style.display = 'block';
+          });
         } catch (error) {
           statusDiv.textContent = 'Ошибка при отправке сообщения.';
           statusDiv.className = 'status error';
+          statusDiv.style.display = 'block';
         }
-        statusDiv.style.display = 'block';
       }
     };
   </script>
