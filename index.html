@@ -71,36 +71,34 @@
           const text = `Ник: ${user.username}\nСообщение: ${message}`;
 
           // Отправляем запрос к API Telegram
-          fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              chat_id: chatId,
-              text: text,
-            }),
-          }).then(response => {
-            if (response.ok) {
-              statusDiv.textContent = 'Сообщение успешно отправлено!';
-              statusDiv.className = 'status success';
-            } else {
-              statusDiv.textContent = 'Ошибка при отправке сообщения.';
-              statusDiv.className = 'status error';
-            }
-            statusDiv.style.display = 'block';
-          }).catch((error) => {
-            statusDiv.textContent = 'Ошибка при отправке сообщения.';
-            statusDiv.className = 'status error';
-            statusDiv.style.display = 'block';
-          });
-        } catch (error) {
-          statusDiv.textContent = 'Ошибка при отправке сообщения.';
-          statusDiv.className = 'status error';
-          statusDiv.style.display = 'block';
-        }
-      }
-    };
+fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    chat_id: chatId,
+    text: text,
+  }),
+}).then(response => {
+  if (response.ok) {
+    statusDiv.textContent = 'Сообщение успешно отправлено!';
+    statusDiv.className = 'status success';
+  } else {
+    response.text().then(text => {
+      console.log('Error response:', text);  // Логируем ошибку с серверной стороны
+    });
+    statusDiv.textContent = 'Ошибка при отправке сообщения.';
+    statusDiv.className = 'status error';
+  }
+  statusDiv.style.display = 'block';
+}).catch((error) => {
+  console.log('Error:', error);  // Логируем ошибку на клиенте
+  statusDiv.textContent = 'Ошибка при отправке сообщения.';
+  statusDiv.className = 'status error';
+  statusDiv.style.display = 'block';
+});
+
   </script>
 </body>
 </html>
