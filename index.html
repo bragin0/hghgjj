@@ -53,8 +53,8 @@
     const form = document.getElementById('message-form');
     const statusDiv = document.getElementById('status');
 
-    // Получаем данные из WebApp через initData
-    const user = Telegram.WebApp.initData ? Telegram.WebApp.initData.user : null;
+    // Получаем данные пользователя через initDataUnsafe
+    const user = Telegram.WebApp.initDataUnsafe ? Telegram.WebApp.initDataUnsafe.user : null;
 
     if (!user) {
       statusDiv.textContent = 'Ошибка: не удалось получить данные пользователя.';
