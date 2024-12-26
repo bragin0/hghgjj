@@ -3,128 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mini App for Telegram Bot</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 10px;
-      background-color: #f5f5f5;
-    }
-    input[type="text"] {
-      width: 100%;
-      padding: 10px;
-      font-size: 16px;
-    }
-    button {
-      width: 100%;
-      padding: 10px;
-      font-size: 16px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-    }
-    .status {
-      margin-top: 10px;
-      padding: 10px;
-      background-color: #e1e1e1;
-      border-radius: 5px;
-      display: none;
-    }
-    .status.success {
-      background-color: #4CAF50;
-      color: white;
-    }
-    .status.error {
-      background-color: #FF6347;
-      color: white;
-    }
-  </style>
+  <title>Pixel Canvas</title>
+  <link rel="stylesheet" href="style.css"> <!-- Подключение CSS -->
 </head>
 <body>
-  <h2>Отправьте сообщение администратору</h2>
-  <form id="message-form">
-    <input type="text" id="message" placeholder="Введите ваше сообщение..." required>
-    <button type="submit">Отправить</button>
-  </form>
-  <div id="status" class="status"></div>
-
-  <script>
-    const form = document.getElementById('message-form');
-    const statusDiv = document.getElementById('status');
-
-    // Получаем данные пользователя через initDataUnsafe
-    const user = Telegram.WebApp.initDataUnsafe ? Telegram.WebApp.initDataUnsafe.user : null;
-
-    if (!user) {
-      statusDiv.textContent = 'Ошибка: не удалось получить данные пользователя.';
-      statusDiv.className = 'status error';
-      statusDiv.style.display = 'block';
-      console.log("Ошибка инициализации WebApp: нет данных пользователя.");
-    } else {
-      console.log("Данные пользователя:", user);
-
-      form.onsubmit = (e) => {
-        e.preventDefault();
-        const message = document.getElementById('message').value;
-
-        // Если сообщение не пустое, отправляем в бот
-        if (message) {
-          try {
-            // Ваш токен бота
-            const botToken = '7488318384:AAH2H0idqXmKoLzE7wJPRPd_Vp5S-5TkTDo';
-            // Чат ID (можно использовать ID админа или группы)
-            const chatId = '511301057';
-
-            // Формируем текст для отправки в бота
-            const text = `Ник: ${user.username}\nСообщение: ${message}`;
-
-            console.log("Тело запроса:", {
-              chat_id: chatId,
-              text: text,
-            });
-
-            // Отправляем запрос к API Telegram
-            fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                chat_id: chatId,
-                text: text,
-              }),
-            }).then(response => {
-              if (response.ok) {
-                statusDiv.textContent = 'Сообщение успешно отправлено!';
-                statusDiv.className = 'status success';
-              } else {
-                response.text().then(text => {
-                  console.log('Ошибка ответа:', text);
-                });
-                statusDiv.textContent = 'Ошибка при отправке сообщения.';
-                statusDiv.className = 'status error';
-              }
-              statusDiv.style.display = 'block';
-            }).catch((error) => {
-              console.log('Ошибка при отправке запроса:', error);
-              statusDiv.textContent = 'Ошибка при отправке сообщения.';
-              statusDiv.className = 'status error';
-              statusDiv.style.display = 'block';
-            });
-          } catch (error) {
-            console.log('Ошибка при обработке сообщения:', error);
-            statusDiv.textContent = 'Ошибка при обработке сообщения.';
-            statusDiv.className = 'status error';
-            statusDiv.style.display = 'block';
-          }
-        } else {
-          statusDiv.textContent = 'Ошибка: сообщение не может быть пустым.';
-          statusDiv.className = 'status error';
-          statusDiv.style.display = 'block';
-        }
-      };
-    }
-  </script>
+  <main>
+    <!-- Добавляем атрибут data-gap для управления размером пикселей -->
+    <pixel-canvas data-gap="7"></pixel-canvas>
+  </main>
+  <script src="script.js"></script> <!-- Подключение JS -->
 </body>
 </html>
