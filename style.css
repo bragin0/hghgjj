@@ -1,0 +1,64 @@
+:root {
+    --space: 1rem;
+    --bg: #09090b;
+    --fg: #e3e3e3;
+    --surface-1: #101012;
+    --surface-2: #27272a;
+    --surface-3: #52525b;
+    --ease-out: cubic-bezier(0.5, 1, 0.89, 1);
+    --ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);
+  }
+  
+  body {
+    margin: 0; /* Убираем отступы */
+    padding: 0; /* Убираем внутренние отступы */
+    color: var(--fg);
+    background: var(--bg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Устанавливаем высоту на весь экран */
+    width: 100vw; /* Устанавливаем ширину на весь экран */
+    box-sizing: border-box;
+  }
+  
+  main {
+    display: flex;
+    flex: 1; /* Заставляем <main> занимать всю доступную область */
+    justify-content: center; /* Центрируем содержимое по горизонтали */
+    align-items: center; /* Центрируем содержимое по вертикали */
+    width: 100%; /* На всю ширину */
+    height: 100%; /* На всю высоту */
+  }
+  
+  .card {
+    display: grid;
+    gap: var(--space); /* Отступы между элементами внутри карточки */
+    place-items: center; /* Центрирование содержимого карточки */
+    background: var(--surface-1); /* Фон карточки */
+    padding: var(--space); /* Внутренние отступы */
+    border-radius: 0.5rem; /* Скругление углов */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* Тень */
+  }
+  
+  pixel-canvas {
+    width: 100vw; /* На всю ширину экрана */
+    height: 100vh; /* На всю высоту экрана */
+    display: block; /* Убираем лишние отступы */
+  }
+  
+  
+  button {
+    padding: 0.5rem 1rem;
+    background: var(--surface-2);
+    color: var(--fg);
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: background-color 0.3s var(--ease-in-out);
+  }
+  
+  button:hover {
+    background: var(--surface-3);
+  }
+  
