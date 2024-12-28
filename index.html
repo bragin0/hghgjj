@@ -86,7 +86,7 @@
       button {
         --border-radius: 4px;
         --border-width: 2px;
-        --border-color: #363439;
+        --border-color: #000000;
         --loader-color: #ffffff;
         --background-color: #000000;
         --text-color: #fff;
@@ -219,8 +219,8 @@
       const user = Telegram.WebApp.initDataUnsafe ? Telegram.WebApp.initDataUnsafe.user : null;
 
       if (!user) {
-        statusDiv.textContent = 'Ошибка: не удалось получить данные пользователя.';
-        statusDiv.className = 'status error';
+        statusDiv.textContent = 'none';
+        statusDiv.className = 'none';
         statusDiv.style.display = 'none';
         console.log("Ошибка инициализации WebApp: нет данных пользователя.");
       } else {
