@@ -163,29 +163,10 @@
         }
       }
 
-      .status {
-        margin-top: 10px;
-        padding: 10px;
-        background-color: #e1e1e1;
-        border-radius: 5px;
-        display: none;
-        text-align: center;
-      }
-
-      .status.success {
-        background-color: #4CAF50;
-        color: white;
-      }
-
-      .status.error {
-        background-color: #FF6347;
-        color: white;
-      }
-
-      /* Стиль для всплывающего сообщения */
+      /* Плавное появление и исчезновение всплывающего сообщения */
       .popup-message {
         position: fixed;
-        top: 0;
+        top: -100px; /* Изначально скрыто */
         left: 50%;
         transform: translateX(-50%);
         display: flex;
@@ -203,7 +184,7 @@
 
       .popup-message.show {
         opacity: 1;
-        top: 10px;
+        top: 10px; /* Плавно появляется */
       }
 
       .avatar {
@@ -262,7 +243,6 @@
                     Отправить
                 </button>
             </form>
-            <div id="status" class="status error" style="display: block;">Ошибка: не удалось получить данные пользователя.</div>
         </div>
     </main>
 
@@ -280,11 +260,10 @@
 
     <script>
       const form = document.getElementById('message-form');
-      const statusDiv = document.getElementById('status').remove();
       const textarea = document.getElementById('message');
       const button = document.querySelector('button');
       const popupMessage = document.getElementById('popup-message');
-
+      
       // Функция для автоизменения высоты textarea
       function adjustTextarea() {
         textarea.style.height = 'auto';  // сбрасываем текущую высоту
@@ -298,15 +277,13 @@
       const user = Telegram.WebApp.initDataUnsafe ? Telegram.WebApp.initDataUnsafe.user : null;
 
       if (!user) {
-        // Просто скрываем блок статуса, чтобы не отображалась ошибка
-        statusDiv.style.display = 'none';
         console.log("Ошибка инициализации WebApp: нет данных пользователя.");
       } else {
         console.log("Данные пользователя:", user);
 
         form.onsubmit = (e) => {
           e.preventDefault();
-          const message = document.getElementById('message').value;
+          const message = textarea.value;
 
           // Если сообщение не пустое, отправляем в бот
           if (message) {
@@ -315,18 +292,9 @@
             spinner.style.animationPlayState = 'running'; // Запускаем анимацию
 
             try {
-              // Ваш токен бота
               const botToken = '7616460556:AAGUc6yAh8lLyQNzPSA7G8xIMOdZAKKmVDY';
-              // Чат ID (можно использовать ID админа или группы)
               const chatId = '511301057';
-
-              // Формируем текст для отправки в бота
               const text = `Ник: @${user.username}\nСообщение:\n${message}`;
-
-              console.log("Тело запроса:", {
-                chat_id: chatId,
-                text: text,
-              });
 
               // Отправляем запрос к API Telegram
               fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
@@ -341,32 +309,21 @@
               }).then(response => {
                 if (response.ok) {
                   // Очистка поля ввода
-                  document.getElementById('message').value = '';
+                  textarea.value = '';
                   adjustTextarea(); // Обновление размера textarea после очистки
-                  statusDiv.style.display = 'none'; // Скрываем блок статуса
                   showPopup(); // Показываем всплывающее сообщение
-                } else {
-                  response.text().then(text => {
-                    console.log('Ошибка ответа:', text);
-                  });
-                  statusDiv.style.display = 'none'; // Скрываем блок статуса
                 }
               }).catch((error) => {
                 console.log('Ошибка при отправке запроса:', error);
-                statusDiv.style.display = 'none'; // Скрываем блок статуса
               }).finally(() => {
                 button.removeAttribute('disabled');
                 spinner.style.animationPlayState = 'paused'; // Останавливаем анимацию
               });
             } catch (error) {
               console.log('Ошибка при обработке сообщения:', error);
-              statusDiv.style.display = 'none'; // Скрываем блок статуса
               button.removeAttribute('disabled');
               spinner.style.animationPlayState = 'paused'; // Останавливаем анимацию
             }
-          } else {
-            // Вместо вывода ошибки просто скрываем блок статуса
-            statusDiv.style.display = 'none'; 
           }
         };
       }
