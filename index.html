@@ -31,16 +31,13 @@
       }
 
       main {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-  box-sizing: border-box;
-  min-height: 100vh; /* Обеспечиваем, чтобы контейнер занимал всю высоту экрана */
-  flex-direction: column; /* Обеспечиваем вертикальное размещение элементов */
-}
-
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        box-sizing: border-box;
+      }
 
       .content {
         width: 100%;
@@ -67,18 +64,17 @@
 
       textarea, input[type="text"] {
         width: 100%;
-  padding: 10px;
-  font-size: 16px;
-  margin: 10px 0;
-  border: 1px solid #737373;
-  border-radius: 5px;
-  background-color: #000000;
-  color: white;
-  min-height: 50px;
-  max-height: 150px; /* Ограничиваем максимальную высоту */
-  resize: vertical;  /* Разрешаем изменять размер по вертикали */
-  overflow-y: auto;  /* Включаем вертикальную прокрутку */
-  transition: all 0.3s;
+        padding: 10px;
+        font-size: 16px;
+        margin: 10px 0;
+        border: 1px solid #737373;
+        border-radius: 5px;
+        background-color: #000000;
+        color: white;
+        min-height: 50px;
+        resize: both;
+        overflow: hidden;
+        transition: all 0.3s;
       }
 
       textarea:focus, input[type="text"]:focus {
@@ -186,7 +182,6 @@
     z-index: 9999; /* Убедитесь, что всплывающее сообщение на переднем плане */
 }
 
-
       .popup-message.show {
         opacity: 1;
         top: 10px; /* Плавно появляется */
@@ -286,99 +281,60 @@
       } else {
         console.log("Данные пользователя:", user);
 
-// Функция для прокрутки страницы до конца
-function scrollToBottom() {
-  window.scrollTo({
-    top: document.documentElement.scrollHeight, // Прокрутка до самого низа страницы
-    behavior: 'smooth'
-  });
-}
+        form.onsubmit = (e) => {
+          e.preventDefault();
+          const message = textarea.value;
 
-// Функция для блокировки прокрутки страницы
-function disableScroll() {
-  document.body.style.overflow = 'hidden';
-}
+          // Если сообщение не пустое, отправляем в бот
+          if (message) {
+            button.setAttribute('disabled', 'true');
+            const spinner = button.querySelector('span');
+            spinner.style.animationPlayState = 'running'; // Запускаем анимацию
 
-// Функция для включения прокрутки страницы
-function enableScroll() {
-  document.body.style.overflow = 'auto';
-}
+            try {
+              const botToken = '7616460556:AAGUc6yAh8lLyQNzPSA7G8xIMOdZAKKmVDY';
+              const chatId = '511301057';
+              const text = `Ник: @${user.username}\nСообщение:\n${message}`;
 
-// Слушаем событие изменения размера окна
-window.addEventListener('resize', () => {
-  if (window.innerHeight < document.documentElement.clientHeight) {
-    disableScroll(); // Блокируем прокрутку, когда клавиатура открыта
-  } else {
-    enableScroll(); // Включаем прокрутку, когда клавиатура скрыта
-  }
-});
-
-
-
-// Вызываем эту функцию после отправки сообщения или изменения размера поля ввода
-form.onsubmit = (e) => {
-  e.preventDefault();
-  const message = textarea.value;
-
-  if (message) {
-    button.setAttribute('disabled', 'true');
-    const spinner = button.querySelector('span');
-    spinner.style.animationPlayState = 'running';
-
-    try {
-      const botToken = '7616460556:AAGUc6yAh8lLyQNzPSA7G8xIMOdZAKKmVDY';
-      const chatId = '511301057';
-      const text = `Ник: @${user.username}\nСообщение:\n${message}`;
-
-      fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          chat_id: chatId,
-          text: text,
-        }),
-      }).then(response => {
-        if (response.ok) {
-          textarea.value = '';
-          adjustTextarea();
-          showPopup();
-          scrollToBottom(); // Прокручиваем страницу к кнопке отправки
-        }
-      }).catch((error) => {
-        console.log('Ошибка при отправке запроса:', error);
-      }).finally(() => {
-        button.removeAttribute('disabled');
-        spinner.style.animationPlayState = 'paused';
-      });
-    } catch (error) {
-      console.log('Ошибка при обработке сообщения:', error);
-      button.removeAttribute('disabled');
-      spinner.style.animationPlayState = 'paused';
-    }
-  }
-};
-
-
+              // Отправляем запрос к API Telegram
+              fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  chat_id: chatId,
+                  text: text,
+                }),
+              }).then(response => {
+                if (response.ok) {
+                  // Очистка поля ввода
+                  textarea.value = '';
+                  adjustTextarea(); // Обновление размера textarea после очистки
+                  showPopup(); // Показываем всплывающее сообщение
+                }
+              }).catch((error) => {
+                console.log('Ошибка при отправке запроса:', error);
+              }).finally(() => {
+                button.removeAttribute('disabled');
+                spinner.style.animationPlayState = 'paused'; // Останавливаем анимацию
+              });
+            } catch (error) {
+              console.log('Ошибка при обработке сообщения:', error);
+              button.removeAttribute('disabled');
+              spinner.style.animationPlayState = 'paused'; // Останавливаем анимацию
+            }
+          }
+        };
       }
-// Функция для отображения всплывающего сообщения
-function showPopup() {
-  popupMessage.classList.add('show');
-  
-  // Прокручиваем страницу, чтобы сообщение стало видимым
-  window.scrollTo({
-    top: popupMessage.offsetTop,    // Прокручиваем к всплывающему сообщению
-    behavior: 'smooth' // Плавная прокрутка
-  });
 
-  setTimeout(() => {
-    popupMessage.classList.remove('show');
-  }, 7000); // Скрыть через 7 секунд
+      // Функция для отображения всплывающего сообщения
+      function showPopup() {
+    popupMessage.classList.add('show');
+    setTimeout(() => {
+        popupMessage.classList.remove('show');
+    }, 7000); // Скрыть через 7 секунд
 }
-
-
-
     </script>
 </body>
 </html>
