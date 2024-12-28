@@ -64,17 +64,18 @@
 
       textarea, input[type="text"] {
         width: 100%;
-        padding: 10px;
-        font-size: 16px;
-        margin: 10px 0;
-        border: 1px solid #737373;
-        border-radius: 5px;
-        background-color: #000000;
-        color: white;
-        min-height: 50px;
-        resize: both;
-        overflow: hidden;
-        transition: all 0.3s;
+  padding: 10px;
+  font-size: 16px;
+  margin: 10px 0;
+  border: 1px solid #737373;
+  border-radius: 5px;
+  background-color: #000000;
+  color: white;
+  min-height: 50px;
+  max-height: 150px; /* Ограничиваем максимальную высоту */
+  resize: vertical;  /* Разрешаем изменять размер по вертикали */
+  overflow-y: auto;  /* Включаем вертикальную прокрутку */
+  transition: all 0.3s;
       }
 
       textarea:focus, input[type="text"]:focus {
@@ -282,67 +283,76 @@
       } else {
         console.log("Данные пользователя:", user);
 
-        form.onsubmit = (e) => {
-          e.preventDefault();
-          const message = textarea.value;
-
-          // Если сообщение не пустое, отправляем в бот
-          if (message) {
-            button.setAttribute('disabled', 'true');
-            const spinner = button.querySelector('span');
-            spinner.style.animationPlayState = 'running'; // Запускаем анимацию
-
-            try {
-              const botToken = '7616460556:AAGUc6yAh8lLyQNzPSA7G8xIMOdZAKKmVDY';
-              const chatId = '511301057';
-              const text = `Ник: @${user.username}\nСообщение:\n${message}`;
-
-              // Отправляем запрос к API Telegram
-              fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                  chat_id: chatId,
-                  text: text,
-                }),
-              }).then(response => {
-                if (response.ok) {
-                  // Очистка поля ввода
-                  textarea.value = '';
-                  adjustTextarea(); // Обновление размера textarea после очистки
-                  showPopup(); // Показываем всплывающее сообщение
-                }
-              }).catch((error) => {
-                console.log('Ошибка при отправке запроса:', error);
-              }).finally(() => {
-                button.removeAttribute('disabled');
-                spinner.style.animationPlayState = 'paused'; // Останавливаем анимацию
-              });
-            } catch (error) {
-              console.log('Ошибка при обработке сообщения:', error);
-              button.removeAttribute('disabled');
-              spinner.style.animationPlayState = 'paused'; // Останавливаем анимацию
-            }
-          }
-        };
-      }
-
-      // Функция для отображения всплывающего сообщения
-      function showPopup() {
-    popupMessage.classList.add('show');
-    
-    // Прокручиваем страницу, чтобы сообщение стало видимым
-    window.scrollTo({
-        top: 0,    // Прокручиваем в начало страницы
-        behavior: 'smooth' // Плавная прокрутка
-    });
-
-    setTimeout(() => {
-        popupMessage.classList.remove('show');
-    }, 7000); // Скрыть через 7 секунд
+        // Функция для прокрутки вниз, чтобы кнопка была видна
+function scrollToBottom() {
+  window.scrollTo({
+    top: document.documentElement.scrollHeight, // Прокручиваем в самый низ
+    behavior: 'smooth' // Плавная прокрутка
+  });
 }
+
+// Вызываем эту функцию после отправки сообщения или изменения размера поля ввода
+form.onsubmit = (e) => {
+  e.preventDefault();
+  const message = textarea.value;
+
+  // Если сообщение не пустое, отправляем в бот
+  if (message) {
+    button.setAttribute('disabled', 'true');
+    const spinner = button.querySelector('span');
+    spinner.style.animationPlayState = 'running'; // Запускаем анимацию
+
+    try {
+      const botToken = '7616460556:AAGUc6yAh8lLyQNzPSA7G8xIMOdZAKKmVDY';
+      const chatId = '511301057';
+      const text = `Ник: @${user.username}\nСообщение:\n${message}`;
+
+      fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: text,
+        }),
+      }).then(response => {
+        if (response.ok) {
+          textarea.value = '';
+          adjustTextarea(); // Обновление размера textarea после очистки
+          showPopup(); // Показываем всплывающее сообщение
+          scrollToBottom(); // Прокручиваем страницу вниз
+        }
+      }).catch((error) => {
+        console.log('Ошибка при отправке запроса:', error);
+      }).finally(() => {
+        button.removeAttribute('disabled');
+        spinner.style.animationPlayState = 'paused'; // Останавливаем анимацию
+      });
+    } catch (error) {
+      console.log('Ошибка при обработке сообщения:', error);
+      button.removeAttribute('disabled');
+      spinner.style.animationPlayState = 'paused'; // Останавливаем анимацию
+    }
+  }
+};
+
+      }
+// Функция для отображения всплывающего сообщения
+function showPopup() {
+  popupMessage.classList.add('show');
+  
+  // Прокручиваем страницу, чтобы сообщение стало видимым
+  window.scrollTo({
+    top: popupMessage.offsetTop,    // Прокручиваем к всплывающему сообщению
+    behavior: 'smooth' // Плавная прокрутка
+  });
+
+  setTimeout(() => {
+    popupMessage.classList.remove('show');
+  }, 7000); // Скрыть через 7 секунд
+}
+
 
 
     </script>
