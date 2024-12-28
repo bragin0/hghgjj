@@ -1,9 +1,12 @@
-<html lang="ru" style="--tg-viewport-height: 100vh; --tg-viewport-stable-height: 100vh;"><head>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Сайт с шапкой</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
       * {
         margin: 0;
         padding: 0;
@@ -11,7 +14,7 @@
       }
 
       body {
-        font-family: Arial, sans-serif;
+        font-family: Inter, 'sans-serif';
         background-color: #000000;
         padding: 0;
         margin: 0;
@@ -23,24 +26,35 @@
       }
 
       header img {
-        width: 100%;  /* Сделаем так, чтобы изображение занимало всю ширину экрана */
-        height: auto;  /* Высота будет автоматически подстраиваться */
+        width: 100%;
+        height: auto;
       }
 
       main {
         width: 100%;
         display: flex;
         justify-content: center;
+        align-items: center;
         padding: 20px;
         box-sizing: border-box;
       }
 
       .content {
         width: 100%;
-        max-width: 1920px; /* Максимальная ширина контента */
+        max-width: 1920px;
         padding: 20px;
         background-color: rgb(0, 0, 0);
         border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      form {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
       }
 
       h2 {
@@ -48,31 +62,105 @@
         color: #333;
       }
 
-      input[type="text"] {
-    width: 100%;
-    padding: 10px;
-    font-size: 16px;
-    margin: 10px 0;
-    border: 1px solid #575757;  /* Серые границы */
-    border-radius: 5px;
-    background-color: #333333;  /* Черный фон */
-    color: white;  /* Белый цвет текста */
-}
-
-
-      button {
+      textarea, input[type="text"] {
         width: 100%;
         padding: 10px;
         font-size: 16px;
-        background-color: #4CAF50;
-        color: white;
-        border: none;
+        margin: 10px 0;
+        border: 1px solid #737373;
         border-radius: 5px;
+        background-color: #000000;
+        color: white;
+        min-height: 50px;
+        resize: both;
+        overflow: hidden;
+        transition: all 0.3s;
+      }
+
+      textarea:focus, input[type="text"]:focus {
+        outline: none;
+        border-color: #2463eb;
+        box-shadow: 0 0 10px rgba(36, 99, 235, 0.5);
+      }
+
+      button {
+        --border-radius: 4px;
+        --border-width: 2px;
+        --border-color: #363439;
+        --loader-color: #ffffff;
+        --background-color: #000000;
+        --text-color: #fff;
+        all: unset;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        width: auto;
+        padding: 10px 20px;
+        font-size: 16px;
+        color: var(--text-color);
         cursor: pointer;
+        border-radius: var(--border-radius);
+        background-color: var(--background-color);
+        margin-top: 10px;
       }
 
       button:hover {
-        background-color: #45a049;
+        background-color: #444;
+      }
+
+      button:disabled {
+        cursor: wait;
+      }
+
+      span {
+        position: absolute;
+        border-width: var(--border-width) solid transparent;
+        border-radius: calc(var(--border-radius) + var(--border-width));
+        width: 100%;
+        height: 100%;
+        box-sizing: content-box;
+        background-color: black;
+        border: var(--border-width) solid transparent;
+        -webkit-mask-image: linear-gradient(#fff 0 0), linear-gradient(#fff 0 0);
+        mask-image: linear-gradient(#fff 0 0), linear-gradient(#fff 0 0);
+        -webkit-mask-clip: padding-box, border-box;
+        mask-clip: padding-box, border-box;
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+      }
+
+      span::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        transform: translate(-50%, -50%);
+        width: 24px;
+        height: 24px;
+        background-color: var(--loader-color);
+        filter: blur(8px);
+        animation: rotate 2s linear infinite;
+        will-change: transform;
+      }
+
+      @keyframes rotate {
+        0% {
+          top: 0;
+          left: 0;
+        }
+        35% {
+          top: 0;
+          left: 100%;
+        }
+        50% {
+          top: 100%;
+          left: 100%;
+        }
+        85% {
+          top: 100%;
+          left: 0;
+        }
       }
 
       .status {
@@ -102,8 +190,11 @@
     <main>
         <div class="content">
             <form id="message-form">
-                <input type="text" id="message" placeholder="Введите ваше сообщение..." required="">
-                <button type="submit">Отправить</button>
+                <textarea id="message" placeholder="Введите ваше сообщение..." required=""></textarea>
+                <button type="submit">
+                    <span></span>
+                    Отправить
+                </button>
             </form>
             <div id="status" class="status error" style="display: block;">Ошибка: не удалось получить данные пользователя.</div>
         </div>
@@ -112,6 +203,17 @@
     <script>
       const form = document.getElementById('message-form');
       const statusDiv = document.getElementById('status');
+      const textarea = document.getElementById('message');
+      const button = document.querySelector('button');
+
+      // Функция для автоизменения высоты textarea
+      function adjustTextarea() {
+        textarea.style.height = 'auto';  // сбрасываем текущую высоту
+        textarea.style.height = `${textarea.scrollHeight}px`;  // устанавливаем высоту в зависимости от содержимого
+      }
+
+      // Инициализация автоизменяющейся высоты
+      textarea.addEventListener('input', adjustTextarea);
 
       // Получаем данные пользователя через initDataUnsafe
       const user = Telegram.WebApp.initDataUnsafe ? Telegram.WebApp.initDataUnsafe.user : null;
@@ -119,7 +221,7 @@
       if (!user) {
         statusDiv.textContent = 'Ошибка: не удалось получить данные пользователя.';
         statusDiv.className = 'status error';
-        statusDiv.style.display = 'block';
+        statusDiv.style.display = 'none';
         console.log("Ошибка инициализации WebApp: нет данных пользователя.");
       } else {
         console.log("Данные пользователя:", user);
@@ -130,6 +232,10 @@
 
           // Если сообщение не пустое, отправляем в бот
           if (message) {
+            button.setAttribute('disabled', 'true');
+            const spinner = button.querySelector('span');
+            spinner.style.animationPlayState = 'running'; // Запускаем анимацию
+
             try {
               // Ваш токен бота
               const botToken = '7488318384:AAH2H0idqXmKoLzE7wJPRPd_Vp5S-5TkTDo';
@@ -171,12 +277,17 @@
                 statusDiv.textContent = 'Ошибка при отправке сообщения.';
                 statusDiv.className = 'status error';
                 statusDiv.style.display = 'block';
+              }).finally(() => {
+                button.removeAttribute('disabled');
+                spinner.style.animationPlayState = 'paused'; // Останавливаем анимацию
               });
             } catch (error) {
               console.log('Ошибка при обработке сообщения:', error);
               statusDiv.textContent = 'Ошибка при обработке сообщения.';
               statusDiv.className = 'status error';
               statusDiv.style.display = 'block';
+              button.removeAttribute('disabled');
+              spinner.style.animationPlayState = 'paused'; // Останавливаем анимацию
             }
           } else {
             statusDiv.textContent = 'Ошибка: сообщение не может быть пустым.';
@@ -186,6 +297,5 @@
         };
       }
     </script>
-
-
-</body></html>
+</body>
+</html>
