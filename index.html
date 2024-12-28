@@ -182,6 +182,7 @@
     z-index: 9999; /* Убедитесь, что всплывающее сообщение на переднем плане */
 }
 
+
       .popup-message.show {
         opacity: 1;
         top: 10px; /* Плавно появляется */
@@ -332,16 +333,17 @@
       function showPopup() {
     popupMessage.classList.add('show');
     
-    // Прокрутка всплывающего сообщения в видимую область
-    popupMessage.scrollIntoView({
-        behavior: 'smooth', // плавная прокрутка
-        block: 'start'      // прокручиваем так, чтобы элемент оказался в верхней части экрана
+    // Прокручиваем страницу, чтобы сообщение стало видимым
+    window.scrollTo({
+        top: 0,    // Прокручиваем в начало страницы
+        behavior: 'smooth' // Плавная прокрутка
     });
 
     setTimeout(() => {
         popupMessage.classList.remove('show');
     }, 7000); // Скрыть через 7 секунд
 }
+
 
     </script>
 </body>
