@@ -197,12 +197,13 @@
         width: 270px;
         height: auto;
         opacity: 0;
-        transition: opacity 0.3s ease-in-out;
+        transition: opacity 0.3s ease-in-out, top 0.3s ease-in-out;
         z-index: 9999;
       }
 
       .popup-message.show {
         opacity: 1;
+        top: 10px;
       }
 
       .avatar {
@@ -343,6 +344,7 @@
                   document.getElementById('message').value = '';
                   adjustTextarea(); // Обновление размера textarea после очистки
                   statusDiv.style.display = 'none'; // Скрываем блок статуса
+                  showPopup(); // Показываем всплывающее сообщение
                 } else {
                   response.text().then(text => {
                     console.log('Ошибка ответа:', text);
@@ -376,13 +378,6 @@
           popupMessage.classList.remove('show');
         }, 5000); // Скрыть через 5 секунд
       }
-
-      // Кнопка "Открыть", при клике показываем сообщение
-      const openButton = document.createElement('button');
-      openButton.textContent = "Открыть";
-      openButton.onclick = showPopup;
-      document.body.appendChild(openButton);
-
     </script>
 </body>
 </html>
