@@ -165,22 +165,23 @@
 
       /* Плавное появление и исчезновение всплывающего сообщения */
       .popup-message {
-        position: fixed;
-        top: -100px; /* Изначально скрыто */
-        left: 50%;
-        transform: translateX(-50%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 10px;
-        background-color: rgb(67, 67, 67);
-        border-radius: 18px;
-        width: 270px;
-        height: auto;
-        opacity: 0;
-        transition: opacity 1s ease-in-out, top 1s ease-in-out;
-        z-index: 9999;
-      }
+    position: fixed;
+    top: 10px; /* фиксированное положение сверху */
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    background-color: rgb(67, 67, 67);
+    border-radius: 18px;
+    width: 270px;
+    height: auto;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+    z-index: 9999;
+}
+
 
       .popup-message.show {
         opacity: 1;
@@ -330,11 +331,12 @@
 
       // Функция для отображения всплывающего сообщения
       function showPopup() {
-        popupMessage.classList.add('show');
-        setTimeout(() => {
-          popupMessage.classList.remove('show');
-        }, 7000); // Скрыть через 5 секунд
-      }
+    popupMessage.classList.add('show');
+    setTimeout(() => {
+        popupMessage.classList.remove('show');
+    }, 7000); // Скрыть через 7 секунд
+}
+
     </script>
 </body>
 </html>
