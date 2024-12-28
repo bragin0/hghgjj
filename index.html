@@ -219,8 +219,8 @@
       const user = Telegram.WebApp.initDataUnsafe ? Telegram.WebApp.initDataUnsafe.user : null;
 
       if (!user) {
-        statusDiv.textContent = 'none';
-        statusDiv.className = 'none';
+        statusDiv.textContent = 'Ошибка: не удалось получить данные пользователя.';
+        statusDiv.className = 'status error';
         statusDiv.style.display = 'none';
         console.log("Ошибка инициализации WebApp: нет данных пользователя.");
       } else {
@@ -271,12 +271,12 @@
                   statusDiv.textContent = 'Ошибка при отправке сообщения.';
                   statusDiv.className = 'status error';
                 }
-                statusDiv.style.display = 'block';
+                statusDiv.style.display = 'none';
               }).catch((error) => {
                 console.log('Ошибка при отправке запроса:', error);
                 statusDiv.textContent = 'Ошибка при отправке сообщения.';
                 statusDiv.className = 'status error';
-                statusDiv.style.display = 'block';
+                statusDiv.style.display = 'none';
               }).finally(() => {
                 button.removeAttribute('disabled');
                 spinner.style.animationPlayState = 'paused'; // Останавливаем анимацию
@@ -285,14 +285,14 @@
               console.log('Ошибка при обработке сообщения:', error);
               statusDiv.textContent = 'Ошибка при обработке сообщения.';
               statusDiv.className = 'status error';
-              statusDiv.style.display = 'block';
+              statusDiv.style.display = 'none';
               button.removeAttribute('disabled');
               spinner.style.animationPlayState = 'paused'; // Останавливаем анимацию
             }
           } else {
             statusDiv.textContent = 'Ошибка: сообщение не может быть пустым.';
             statusDiv.className = 'status error';
-            statusDiv.style.display = 'block';
+            statusDiv.style.display = 'none';
           }
         };
       }
