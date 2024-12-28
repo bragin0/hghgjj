@@ -182,29 +182,68 @@
         color: white;
       }
 
-      .thank-you-message {
+      /* Стиль для всплывающего сообщения */
+      .popup-message {
+        position: fixed;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
         display: flex;
         align-items: center;
-        background-color: #333;
-        color: white;
-        border-radius: 8px;
+        justify-content: center;
         padding: 10px;
-        margin-top: 20px;
-        width: 100%;
-        max-width: 500px;
-        justify-content: flex-start;
+        background-color: rgb(67, 67, 67);
+        border-radius: 18px;
+        width: 270px;
+        height: auto;
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+        z-index: 9999;
       }
 
-      .thank-you-message img {
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
+      .popup-message.show {
+        opacity: 1;
+      }
+
+      .avatar {
+        height: 33px;
         margin-right: 10px;
       }
 
-      .thank-you-message span {
-        font-size: 16px;
-        color: #fff;
+      .text-content {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        opacity: 0.8;
+      }
+
+      .top-row {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+      }
+
+      h2 {
+        font-size: 12px;
+        color: white;
+        line-height: 12px;
+        font-weight: bold;
+        margin-top: 0;
+        margin-bottom: 4px;
+        display: inline-block;
+      }
+
+      a {
+        font-size: 10px;
+        color: rgba(255, 255, 255, 0.55);
+      }
+
+      p {
+        font-size: 12px;
+        color: white;
+        line-height: 16px;
+        max-width: 300px;
+        margin: 0;
       }
 
     </style>
@@ -223,20 +262,27 @@
                 </button>
             </form>
             <div id="status" class="status error" style="display: block;">Ошибка: не удалось получить данные пользователя.</div>
-            <!-- Место для благодарственного сообщения -->
-            <div id="thank-you-message" class="thank-you-message" style="display: none;">
-                <img src="https://www.example.com/avatar.jpg" alt="Аватар пользователя">
-                <span>Спасибо за ТЗ! С вами скоро свяжутся.</span>
-            </div>
         </div>
     </main>
+
+    <!-- Сообщение, которое будет показываться сверху -->
+    <div class="popup-message" id="popup-message">
+        <img src="https://psv4.userapi.com/s/v1/d/ZhR1Pzi0R7unnIghMxvsHLVzW7uQoLnyu2tgUd1iJPoYy6NPgrRIagBzTn0zH3BvDDpJWwc8ETGBJvrhHJk_M2kgoGqXpS1sKrs1mpkBKMS4P4gfW0LlGA/9.png" class="avatar">
+        <div class="text-content">
+            <div class="top-row">
+                <h2>TGbot</h2>
+                <a>Сейчас</a>
+            </div>
+            <p>Спасибо за ТЗ, с вами скоро свяжутся</p>
+        </div>
+    </div>
 
     <script>
       const form = document.getElementById('message-form');
       const statusDiv = document.getElementById('status').remove();
       const textarea = document.getElementById('message');
       const button = document.querySelector('button');
-      const thankYouMessage = document.getElementById('thank-you-message');
+      const popupMessage = document.getElementById('popup-message');
 
       // Функция для автоизменения высоты textarea
       function adjustTextarea() {
@@ -297,14 +343,6 @@
                   document.getElementById('message').value = '';
                   adjustTextarea(); // Обновление размера textarea после очистки
                   statusDiv.style.display = 'none'; // Скрываем блок статуса
-
-                  // Показать благодарственное сообщение
-                  thankYouMessage.style.display = 'flex';
-
-                  // Скрыть сообщение через 5 секунд
-                  setTimeout(() => {
-                    thankYouMessage.style.display = 'none';
-                  }, 5000);
                 } else {
                   response.text().then(text => {
                     console.log('Ошибка ответа:', text);
@@ -330,6 +368,20 @@
           }
         };
       }
+
+      // Функция для отображения всплывающего сообщения
+      function showPopup() {
+        popupMessage.classList.add('show');
+        setTimeout(() => {
+          popupMessage.classList.remove('show');
+        }, 5000); // Скрыть через 5 секунд
+      }
+
+      // Кнопка "Открыть", при клике показываем сообщение
+      const openButton = document.createElement('button');
+      openButton.textContent = "Открыть";
+      openButton.onclick = showPopup;
+      document.body.appendChild(openButton);
 
     </script>
 </body>
