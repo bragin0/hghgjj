@@ -181,6 +181,32 @@
         background-color: #FF6347;
         color: white;
       }
+
+      .thank-you-message {
+        display: flex;
+        align-items: center;
+        background-color: #333;
+        color: white;
+        border-radius: 8px;
+        padding: 10px;
+        margin-top: 20px;
+        width: 100%;
+        max-width: 500px;
+        justify-content: flex-start;
+      }
+
+      .thank-you-message img {
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        margin-right: 10px;
+      }
+
+      .thank-you-message span {
+        font-size: 16px;
+        color: #fff;
+      }
+
     </style>
 </head>
 <body>
@@ -197,6 +223,11 @@
                 </button>
             </form>
             <div id="status" class="status error" style="display: block;">Ошибка: не удалось получить данные пользователя.</div>
+            <!-- Место для благодарственного сообщения -->
+            <div id="thank-you-message" class="thank-you-message" style="display: none;">
+                <img src="https://www.example.com/avatar.jpg" alt="Аватар пользователя">
+                <span>Спасибо за ТЗ! С вами скоро свяжутся.</span>
+            </div>
         </div>
     </main>
 
@@ -205,53 +236,51 @@
       const statusDiv = document.getElementById('status').remove();
       const textarea = document.getElementById('message');
       const button = document.querySelector('button');
-    
-      // Функция для автоизменяющейся высоты textarea
+      const thankYouMessage = document.getElementById('thank-you-message');
+
+      // Функция для автоизменения высоты textarea
       function adjustTextarea() {
         textarea.style.height = 'auto';  // сбрасываем текущую высоту
         textarea.style.height = `${textarea.scrollHeight}px`;  // устанавливаем высоту в зависимости от содержимого
       }
-    
+
       // Инициализация автоизменяющейся высоты
       textarea.addEventListener('input', adjustTextarea);
-    
+
       // Получаем данные пользователя через initDataUnsafe
       const user = Telegram.WebApp.initDataUnsafe ? Telegram.WebApp.initDataUnsafe.user : null;
-    
+
       if (!user) {
         // Просто скрываем блок статуса, чтобы не отображалась ошибка
         statusDiv.style.display = 'none';
         console.log("Ошибка инициализации WebApp: нет данных пользователя.");
       } else {
         console.log("Данные пользователя:", user);
-    
+
         form.onsubmit = (e) => {
-          e.preventDefault(); // Предотвращаем стандартное поведение формы
+          e.preventDefault();
           const message = document.getElementById('message').value;
-    
+
           // Если сообщение не пустое, отправляем в бот
           if (message) {
             button.setAttribute('disabled', 'true');
             const spinner = button.querySelector('span');
             spinner.style.animationPlayState = 'running'; // Запускаем анимацию
-    
+
             try {
               // Ваш токен бота
-              const botToken = '7488318384:AAH2H0idqXmKoLzE7wJPRPd_Vp5S-5TkTDo';
+              const botToken = '7616460556:AAGUc6yAh8lLyQNzPSA7G8xIMOdZAKKmVDY';
               // Чат ID (можно использовать ID админа или группы)
               const chatId = '511301057';
-    
-              // Сохраняем исходное сообщение для отправки
-              const originalMessage = message;
-    
+
               // Формируем текст для отправки в бота
-              const text = `Ник: @${user.username}\nСообщение:\n${originalMessage}`;
-    
+              const text = `Ник: @${user.username}\nСообщение:\n${message}`;
+
               console.log("Тело запроса:", {
                 chat_id: chatId,
                 text: text,
               });
-    
+
               // Отправляем запрос к API Telegram
               fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
                 method: 'POST',
@@ -264,10 +293,18 @@
                 }),
               }).then(response => {
                 if (response.ok) {
-                  // После отправки сообщения, меняем текст в поле на благодарность
-                  document.getElementById('message').value = 'Спасибо за предоставление ТЗ\n С вами скоро свяжутся';
-                  adjustTextarea(); // Обновляем размер textarea после изменения текста
+                  // Очистка поля ввода
+                  document.getElementById('message').value = '';
+                  adjustTextarea(); // Обновление размера textarea после очистки
                   statusDiv.style.display = 'none'; // Скрываем блок статуса
+
+                  // Показать благодарственное сообщение
+                  thankYouMessage.style.display = 'flex';
+
+                  // Скрыть сообщение через 5 секунд
+                  setTimeout(() => {
+                    thankYouMessage.style.display = 'none';
+                  }, 5000);
                 } else {
                   response.text().then(text => {
                     console.log('Ошибка ответа:', text);
@@ -293,8 +330,7 @@
           }
         };
       }
+
     </script>
-    
-    
 </body>
 </html>
