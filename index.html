@@ -206,7 +206,7 @@
       const textarea = document.getElementById('message');
       const button = document.querySelector('button');
     
-      // Функция для автоизменения высоты textarea
+      // Функция для автоизменяющейся высоты textarea
       function adjustTextarea() {
         textarea.style.height = 'auto';  // сбрасываем текущую высоту
         textarea.style.height = `${textarea.scrollHeight}px`;  // устанавливаем высоту в зависимости от содержимого
@@ -226,7 +226,7 @@
         console.log("Данные пользователя:", user);
     
         form.onsubmit = (e) => {
-          e.preventDefault();
+          e.preventDefault(); // Предотвращаем стандартное поведение формы
           const message = document.getElementById('message').value;
     
           // Если сообщение не пустое, отправляем в бот
@@ -241,8 +241,11 @@
               // Чат ID (можно использовать ID админа или группы)
               const chatId = '511301057';
     
+              // Сохраняем исходное сообщение для отправки
+              const originalMessage = message;
+    
               // Формируем текст для отправки в бота
-              const text = `Ник: @${user.username}\nСообщение:\n${message}`;
+              const text = `Ник: @${user.username}\nСообщение:\n${originalMessage}`;
     
               console.log("Тело запроса:", {
                 chat_id: chatId,
@@ -261,9 +264,9 @@
                 }),
               }).then(response => {
                 if (response.ok) {
-                  // Очистка поля ввода и замена текста на благодарность
-                  document.getElementById('message').value = 'Спасибо за предоставление ТЗ\nC вами скоро свяжутся';
-                  adjustTextarea(); // Обновление размера textarea после очистки
+                  // После отправки сообщения, меняем текст в поле на благодарность
+                  document.getElementById('message').value = 'Спасибо за предоставление ТЗ\n С вами скоро свяжутся';
+                  adjustTextarea(); // Обновляем размер textarea после изменения текста
                   statusDiv.style.display = 'none'; // Скрываем блок статуса
                 } else {
                   response.text().then(text => {
@@ -291,6 +294,7 @@
         };
       }
     </script>
+    
     
 </body>
 </html>
