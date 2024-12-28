@@ -184,7 +184,7 @@
 
       .popup-message.show {
         opacity: 1;
-        top: 10px; /* Плавно появляется */
+        top: 100px; /* Плавно появляется */
       }
 
       .avatar {
@@ -264,7 +264,7 @@
       const button = document.querySelector('button');
       const popupMessage = document.getElementById('popup-message');
       
-      // Функция для автоизменения высоты textarea
+      // Функция для автоизменяющейся высоты textarea
       function adjustTextarea() {
         textarea.style.height = 'auto';  // сбрасываем текущую высоту
         textarea.style.height = `${textarea.scrollHeight}px`;  // устанавливаем высоту в зависимости от содержимого
@@ -333,7 +333,7 @@
         popupMessage.classList.add('show');
         setTimeout(() => {
           popupMessage.classList.remove('show');
-        }, 5000); // Скрыть через 5 секунд
+        }, 7000); // Скрыть через 5 секунд
       }
     </script>
 </body>
