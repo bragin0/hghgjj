@@ -166,7 +166,7 @@
       /* Плавное появление и исчезновение всплывающего сообщения */
       .popup-message {
     position: fixed;
-    top: 50px; /* Учитываем отступ сверху */
+    top: 10px; /* Это расстояние от верхней части экрана */
     left: 50%;
     transform: translateX(-50%);
     display: flex;
@@ -179,11 +179,8 @@
     height: auto;
     opacity: 0;
     transition: opacity 1s ease-in-out;
-    z-index: 9999; /* Убедитесь, что всплывающее сообщение находится поверх других элементов */
+    z-index: 9999; /* Убедитесь, что всплывающее сообщение на переднем плане */
 }
-
-
-
 
       .popup-message.show {
         opacity: 1;
@@ -334,10 +331,18 @@
       // Функция для отображения всплывающего сообщения
       function showPopup() {
     popupMessage.classList.add('show');
+    
+    // Прокрутка всплывающего сообщения в видимую область
+    popupMessage.scrollIntoView({
+        behavior: 'smooth', // плавная прокрутка
+        block: 'start'      // прокручиваем так, чтобы элемент оказался в верхней части экрана
+    });
+
     setTimeout(() => {
         popupMessage.classList.remove('show');
     }, 7000); // Скрыть через 7 секунд
 }
+
     </script>
 </body>
 </html>
