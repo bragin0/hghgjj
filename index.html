@@ -262,7 +262,7 @@
               }).then(response => {
                 if (response.ok) {
                   // Очистка поля ввода и замена текста на благодарность
-                  document.getElementById('message').value = 'Спасибо за предоставление ТЗ, с вами свяжутся';
+                  document.getElementById('message').value = 'Спасибо за предоставление ТЗ\nC вами скоро свяжутся';
                   adjustTextarea(); // Обновление размера textarea после очистки
                   statusDiv.style.display = 'none'; // Скрываем блок статуса
                 } else {
