@@ -31,13 +31,16 @@
       }
 
       main {
-        width: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 20px;
-        box-sizing: border-box;
-      }
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
+  min-height: 100vh; /* Обеспечиваем, чтобы контейнер занимал всю высоту экрана */
+  flex-direction: column; /* Обеспечиваем вертикальное размещение элементов */
+}
+
 
       .content {
         width: 100%;
@@ -283,24 +286,44 @@
       } else {
         console.log("Данные пользователя:", user);
 
-        // Функция для прокрутки вниз, чтобы кнопка была видна
+// Функция для прокрутки страницы до конца
 function scrollToBottom() {
   window.scrollTo({
-    top: document.documentElement.scrollHeight, // Прокручиваем в самый низ
-    behavior: 'smooth' // Плавная прокрутка
+    top: document.documentElement.scrollHeight, // Прокрутка до самого низа страницы
+    behavior: 'smooth'
   });
 }
+
+// Функция для блокировки прокрутки страницы
+function disableScroll() {
+  document.body.style.overflow = 'hidden';
+}
+
+// Функция для включения прокрутки страницы
+function enableScroll() {
+  document.body.style.overflow = 'auto';
+}
+
+// Слушаем событие изменения размера окна
+window.addEventListener('resize', () => {
+  if (window.innerHeight < document.documentElement.clientHeight) {
+    disableScroll(); // Блокируем прокрутку, когда клавиатура открыта
+  } else {
+    enableScroll(); // Включаем прокрутку, когда клавиатура скрыта
+  }
+});
+
+
 
 // Вызываем эту функцию после отправки сообщения или изменения размера поля ввода
 form.onsubmit = (e) => {
   e.preventDefault();
   const message = textarea.value;
 
-  // Если сообщение не пустое, отправляем в бот
   if (message) {
     button.setAttribute('disabled', 'true');
     const spinner = button.querySelector('span');
-    spinner.style.animationPlayState = 'running'; // Запускаем анимацию
+    spinner.style.animationPlayState = 'running';
 
     try {
       const botToken = '7616460556:AAGUc6yAh8lLyQNzPSA7G8xIMOdZAKKmVDY';
@@ -319,23 +342,24 @@ form.onsubmit = (e) => {
       }).then(response => {
         if (response.ok) {
           textarea.value = '';
-          adjustTextarea(); // Обновление размера textarea после очистки
-          showPopup(); // Показываем всплывающее сообщение
-          scrollToBottom(); // Прокручиваем страницу вниз
+          adjustTextarea();
+          showPopup();
+          scrollToBottom(); // Прокручиваем страницу к кнопке отправки
         }
       }).catch((error) => {
         console.log('Ошибка при отправке запроса:', error);
       }).finally(() => {
         button.removeAttribute('disabled');
-        spinner.style.animationPlayState = 'paused'; // Останавливаем анимацию
+        spinner.style.animationPlayState = 'paused';
       });
     } catch (error) {
       console.log('Ошибка при обработке сообщения:', error);
       button.removeAttribute('disabled');
-      spinner.style.animationPlayState = 'paused'; // Останавливаем анимацию
+      spinner.style.animationPlayState = 'paused';
     }
   }
 };
+
 
       }
 // Функция для отображения всплывающего сообщения
