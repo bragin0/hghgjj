@@ -106,7 +106,7 @@
       }
 
       button:hover {
-        background-color: #444;
+        background-color: #000000;
       }
 
       button:disabled {
@@ -205,90 +205,92 @@
       const statusDiv = document.getElementById('status').remove();
       const textarea = document.getElementById('message');
       const button = document.querySelector('button');
-
+    
       // Функция для автоизменения высоты textarea
       function adjustTextarea() {
         textarea.style.height = 'auto';  // сбрасываем текущую высоту
         textarea.style.height = `${textarea.scrollHeight}px`;  // устанавливаем высоту в зависимости от содержимого
       }
-
+    
       // Инициализация автоизменяющейся высоты
       textarea.addEventListener('input', adjustTextarea);
-
+    
       // Получаем данные пользователя через initDataUnsafe
       const user = Telegram.WebApp.initDataUnsafe ? Telegram.WebApp.initDataUnsafe.user : null;
-
+    
       if (!user) {
-  // Просто скрываем блок статуса, чтобы не отображалась ошибка
-  statusDiv.style.display = 'none';
-  console.log("Ошибка инициализации WebApp: нет данных пользователя.");
-} else {
-  console.log("Данные пользователя:", user);
-
-  form.onsubmit = (e) => {
-    e.preventDefault();
-    const message = document.getElementById('message').value;
-
-    // Если сообщение не пустое, отправляем в бот
-    if (message) {
-      button.setAttribute('disabled', 'true');
-      const spinner = button.querySelector('span');
-      spinner.style.animationPlayState = 'running'; // Запускаем анимацию
-
-      try {
-        // Ваш токен бота
-        const botToken = '7488318384:AAH2H0idqXmKoLzE7wJPRPd_Vp5S-5TkTDo';
-        // Чат ID (можно использовать ID админа или группы)
-        const chatId = '511301057';
-
-        // Формируем текст для отправки в бота
-        const text = `Ник: @${user.username}\nСообщение:\n${message}`;
-
-        console.log("Тело запроса:", {
-          chat_id: chatId,
-          text: text,
-        });
-
-        // Отправляем запрос к API Telegram
-        fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            chat_id: chatId,
-            text: text,
-          }),
-        }).then(response => {
-          if (response.ok) {
-            // Убираем любые изменения в статусе
-            statusDiv.style.display = 'none'; 
+        // Просто скрываем блок статуса, чтобы не отображалась ошибка
+        statusDiv.style.display = 'none';
+        console.log("Ошибка инициализации WebApp: нет данных пользователя.");
+      } else {
+        console.log("Данные пользователя:", user);
+    
+        form.onsubmit = (e) => {
+          e.preventDefault();
+          const message = document.getElementById('message').value;
+    
+          // Если сообщение не пустое, отправляем в бот
+          if (message) {
+            button.setAttribute('disabled', 'true');
+            const spinner = button.querySelector('span');
+            spinner.style.animationPlayState = 'running'; // Запускаем анимацию
+    
+            try {
+              // Ваш токен бота
+              const botToken = '7488318384:AAH2H0idqXmKoLzE7wJPRPd_Vp5S-5TkTDo';
+              // Чат ID (можно использовать ID админа или группы)
+              const chatId = '511301057';
+    
+              // Формируем текст для отправки в бота
+              const text = `Ник: @${user.username}\nСообщение:\n${message}`;
+    
+              console.log("Тело запроса:", {
+                chat_id: chatId,
+                text: text,
+              });
+    
+              // Отправляем запрос к API Telegram
+              fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  chat_id: chatId,
+                  text: text,
+                }),
+              }).then(response => {
+                if (response.ok) {
+                  // Очистка поля ввода и замена текста на благодарность
+                  document.getElementById('message').value = 'Спасибо за предоставление ТЗ, с вами свяжутся';
+                  adjustTextarea(); // Обновление размера textarea после очистки
+                  statusDiv.style.display = 'none'; // Скрываем блок статуса
+                } else {
+                  response.text().then(text => {
+                    console.log('Ошибка ответа:', text);
+                  });
+                  statusDiv.style.display = 'none'; // Скрываем блок статуса
+                }
+              }).catch((error) => {
+                console.log('Ошибка при отправке запроса:', error);
+                statusDiv.style.display = 'none'; // Скрываем блок статуса
+              }).finally(() => {
+                button.removeAttribute('disabled');
+                spinner.style.animationPlayState = 'paused'; // Останавливаем анимацию
+              });
+            } catch (error) {
+              console.log('Ошибка при обработке сообщения:', error);
+              statusDiv.style.display = 'none'; // Скрываем блок статуса
+              button.removeAttribute('disabled');
+              spinner.style.animationPlayState = 'paused'; // Останавливаем анимацию
+            }
           } else {
-            response.text().then(text => {
-              console.log('Ошибка ответа:', text);
-            });
-            statusDiv.style.display = 'none'; // Скрываем блок статуса
+            // Вместо вывода ошибки просто скрываем блок статуса
+            statusDiv.style.display = 'none'; 
           }
-        }).catch((error) => {
-          console.log('Ошибка при отправке запроса:', error);
-          statusDiv.style.display = 'none'; // Скрываем блок статуса
-        }).finally(() => {
-          button.removeAttribute('disabled');
-          spinner.style.animationPlayState = 'paused'; // Останавливаем анимацию
-        });
-      } catch (error) {
-        console.log('Ошибка при обработке сообщения:', error);
-        statusDiv.style.display = 'none'; // Скрываем блок статуса
-        button.removeAttribute('disabled');
-        spinner.style.animationPlayState = 'paused'; // Останавливаем анимацию
+        };
       }
-    } else {
-      // Вместо вывода ошибки просто скрываем блок статуса
-      statusDiv.style.display = 'none'; 
-    }
-  };
-}
-
     </script>
+    
 </body>
 </html>
