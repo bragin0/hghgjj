@@ -165,9 +165,9 @@
 
       /* Плавное появление и исчезновение всплывающего сообщения */
       .popup-message {
-    position: fixed;
-    top: 10px; /* Это расстояние от верхней части экрана */
-    left: 50%;
+    position: fixed; /* Фиксирует сообщение на экране */
+    top: 0; /* Привязывает сообщение к верхней части страницы */
+    left: 50%; /* Центрирует по горизонтали */
     transform: translateX(-50%);
     display: flex;
     align-items: center;
@@ -179,8 +179,9 @@
     height: auto;
     opacity: 0;
     transition: opacity 1s ease-in-out;
-    z-index: 9999; /* Убедитесь, что всплывающее сообщение на переднем плане */
+    z-index: 9999; /* Сообщение всегда поверх */
 }
+
 
       .popup-message.show {
         opacity: 1;
@@ -336,6 +337,7 @@
         popupMessage.classList.remove('show');
     }, 7000); // Скрыть через 7 секунд
 }
+
     </script>
 </body>
 </html>
