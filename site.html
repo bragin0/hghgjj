@@ -12,7 +12,12 @@
 
         html, body {
             height: 100%;
-            overflow: hidden; /* Убираем прокрутку */
+            overflow-y: scroll; /* Оставляем прокрутку */
+            scrollbar-width: none; /* Для Firefox */
+        }
+
+        body::-webkit-scrollbar {
+            display: none; /* Для Chrome, Safari */
         }
 
         .background {
@@ -25,8 +30,7 @@
 
         .photo {
             width: 100%;
-            height: 100vh; /* Заполняет экран */
-            object-fit: cover; /* Подгоняет изображение */
+            height: auto; /* Масштабируется пропорционально */
         }
 
         .no-underline {
