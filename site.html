@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -22,10 +23,11 @@
 
         .background {
             width: 100%;
-            height: 100vh;
+            height: 100vh; /* Высота на весь экран */
             background-image: url('img.jpg');
             background-size: cover;
             background-position: center;
+            position: relative; /* Для позиционирования внутри */
         }
 
         .photo {
@@ -69,6 +71,37 @@
             color: #000000;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
         }
+
+        /* Стили для кнопки */
+        .button-container {
+            position: relative; /* Относительное позиционирование */
+            margin-top: auto; /* Размещает элемент внизу родителя */
+            text-align: center; /* Центрирование */
+            padding: 20px 0; /* Отступ от нижнего края */
+            bottom: 400px;
+        }
+
+        .button-link {
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .button-image {
+            width: 200px; /* Размер изображения кнопки */
+            height: auto;
+            border-radius: 10px; /* Закругленные углы */
+            transition: transform 0.5s ease-in-out;
+            animation: pulse 1.5s infinite alternate ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            100% {
+                transform: scale(1.1);
+            }
+        }
     </style>
 </head>
 <body>
@@ -78,6 +111,12 @@
 
     <div class="background">
         <img src="img.jpg" alt="Моя фотка" class="photo">
+        <!-- Кнопка поверх фотографии внизу -->
+        <div class="button-container">
+            <a href="https://disk.yandex.ru/d/g5A4kPttpJOEKw" class="button-link" target="_blank">
+                <img src="6.png" alt="Кнопка" class="button-image">
+            </a>
+        </div>
     </div>
 </body>
 </html>
