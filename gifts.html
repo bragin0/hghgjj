@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Gift Marketplace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f0f0f;
+            color: #e5e5e5;
+            transition: all 0.3s ease;
+        }
+        
+        .gift-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .gift-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3a7bd5 0%, #00d2ff 100%);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .input-field:focus {
+            border-color: #3a7bd5;
+            box-shadow: 0 0 0 2px rgba(58, 123, 213, 0.2);
+        }
+        
+        .avatar {
+            border: 2px solid #3a7bd5;
+        }
+        
+        .loading-spinner {
+            border-top-color: #3a7bd5;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div id="app" class="container mx-auto px-4 py-6 max-w-6xl">
+        <!-- Header with user profile -->
+        <header class="flex justify-between items-center mb-8">
+            <div class="flex items-center space-x-3 cursor-pointer" id="profile-btn">
+                <div class="avatar w-10 h-10 rounded-full overflow-hidden bg-gray-700 flex items-center justify-center">
+                    <img id="user-avatar" src="https://via.placeholder.com/40" alt="User Avatar" class="w-full h-full object-cover">
+                </div>
+                <span id="username" class="font-medium text-white">Username</span>
+            </div>
+            <h1 class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600">
+                Telegram Gift Market
+            </h1>
+            <div class="w-10"></div> <!-- Spacer for balance -->
+        </header>
+
+        <!-- Main content area -->
+        <main>
+            <!-- Home page (default) -->
+            <div id="home-page">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-semibold text-white">Available Gifts</h2>
+                    <div class="flex space-x-2">
+                        <select id="sort-select" class="bg-gray-800 text-white rounded-lg px-3 py-2 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="price-asc">Price: Low to High</option>
+                            <option value="price-desc">Price: High to Low</option>
+                            <option value="newest">Newest First</option>
+                        </select>
+                        <button id="refresh-btn" class="bg-gray-800 text-white rounded-lg px-4 py-2 border border-gray-700 hover:bg-gray-700 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="gifts-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <!-- Gift cards will be inserted here by JavaScript -->
+                </div>
+
+                <div id="loading-more" class="text-center py-8 hidden">
+                    <div class="inline-block h-8 w-8 border-4 border-gray-600 border-t-blue-500 rounded-full loading-spinner"></div>
+                </div>
+            </div>
+
+            <!-- Profile page (hidden by default) -->
+            <div id="profile-page" class="hidden">
+                <div class="flex items-center mb-8">
+                    <button id="back-btn" class="mr-4 text-blue-500 hover:text-blue-400 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                    </button>
+                    <div class="flex items-center space-x-4">
+                        <div class="avatar w-20 h-20 rounded-full overflow-hidden bg-gray-700 flex items-center justify-center">
+                            <img id="profile-avatar" src="https://via.placeholder.com/80" alt="Profile Avatar" class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <h2 id="profile-username" class="text-2xl font-bold text-white">Username</h2>
+                            <p class="text-gray-400">Your gifts for sale</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-semibold text-white">Your Gifts</h3>
+                    <button id="add-gift-btn" class="btn-success text-white rounded-full px-4 py-2 font-medium hover:opacity-90 transition">
+                        Add Gift
+                    </button>
+                </div>
+
+                <div id="user-gifts-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    <!-- User's gift cards will be inserted here by JavaScript -->
+                </div>
+
+                <div id="no-gifts-message" class="text-center py-12">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                    </svg>
+                    <h3 class="text-xl font-medium text-gray-400 mb-2">No gifts for sale</h3>
+                    <p class="text-gray-500">Add your first gift using the button above</p>
+                </div>
+            </div>
+
+            <!-- Add Gift Modal (hidden by default) -->
+            <div id="add-gift-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden">
+                <div class="bg-gray-900 rounded-xl p-6 w-full max-w-md mx-4 border border-gray-800">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-white">Add Gift to Sell</h3>
+                        <button id="close-modal-btn" class="text-gray-400 hover:text-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-gray-400 mb-2">Select Gift</label>
+                        <div class="grid grid-cols-3 gap-3">
+                            <!-- Sample gift options -->
+                            <div class="gift-option cursor-pointer p-3 rounded-lg border border-gray-800 hover:border-blue-500 transition" data-gift-id="1">
+                                <img src="https://via.placeholder.com/100" alt="Gift" class="w-full h-20 object-contain mb-2">
+                                <p class="text-center text-sm text-white">Premium Gift</p>
+                            </div>
+                            <div class="gift-option cursor-pointer p-3 rounded-lg border border-gray-800 hover:border-blue-500 transition" data-gift-id="2">
+                                <img src="https://via.placeholder.com/100" alt="Gift" class="w-full h-20 object-contain mb-2">
+                                <p class="text-center text-sm text-white">Special Gift</p>
+                            </div>
+                            <div class="gift-option cursor-pointer p-3 rounded-lg border border-gray-800 hover:border-blue-500 transition" data-gift-id="3">
+                                <img src="https://via.placeholder.com/100" alt="Gift" class="w-full h-20 object-contain mb-2">
+                                <p class="text-center text-sm text-white">Exclusive Gift</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="gift-price" class="block text-gray-400 mb-2">Price (RUB)</label>
+                        <input type="number" id="gift-price" class="w-full bg-gray-800 text-white rounded-lg px-4 py-3 border border-gray-700 input-field focus:outline-none focus:border-blue-500" placeholder="Enter price" min="1">
+                        <p id="price-error" class="text-red-500 text-sm mt-1 hidden">Please enter a valid price (minimum 1 RUB)</p>
+                    </div>
+
+                    <button id="confirm-add-btn" class="w-full btn-primary text-white rounded-lg px-4 py-3 font-medium hover:opacity-90 transition">
+                        Add to Marketplace
+                    </button>
+                </div>
+            </div>
+
+            <!-- Edit Price Modal (hidden by default) -->
+            <div id="edit-price-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden">
+                <div class="bg-gray-900 rounded-xl p-6 w-full max-w-md mx-4 border border-gray-800">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-white">Edit Gift Price</h3>
+                        <button id="close-edit-modal-btn" class="text-gray-400 hover:text-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="mb-6">
+                        <img id="edit-gift-image" src="https://via.placeholder.com/100" alt="Gift" class="w-24 h-24 object-contain mx-auto mb-4">
+                        <h4 id="edit-gift-name" class="text-center text-lg font-medium text-white mb-2">Premium Gift</h4>
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="edit-gift-price" class="block text-gray-400 mb-2">New Price (RUB)</label>
+                        <input type="number" id="edit-gift-price" class="w-full bg-gray-800 text-white rounded-lg px-4 py-3 border border-gray-700 input-field focus:outline-none focus:border-blue-500" placeholder="Enter new price" min="1">
+                        <p id="edit-price-error" class="text-red-500 text-sm mt-1 hidden">Please enter a valid price (minimum 1 RUB)</p>
+                    </div>
+
+                    <button id="confirm-edit-btn" class="w-full btn-primary text-white rounded-lg px-4 py-3 font-medium hover:opacity-90 transition">
+                        Update Price
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Toast notification (hidden by default) -->
+        <div id="toast" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg flex items-center hidden z-50">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <span id="toast-message">Operation successful</span>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Telegram Web App
+        const tg = window.Telegram.WebApp;
+        
+        // Sample data for gifts
+        const sampleGifts = [
+            { id: 1, name: "Premium Gift", price: 150, image: "https://via.placeholder.com/100", seller: "user1", sellerAvatar: "https://via.placeholder.com/40" },
+            { id: 2, name: "Special Gift", price: 250, image: "https://via.placeholder.com/100", seller: "user2", sellerAvatar: "https://via.placeholder.com/40" },
+            { id: 3, name: "Exclusive Gift", price: 350, image: "https://via.placeholder.com/100", seller: "user3", sellerAvatar: "https://via.placeholder.com/40" },
+            { id: 4, name: "Rare Gift", price: 450, image: "https://via.placeholder.com/100", seller: "user4", sellerAvatar: "https://via.placeholder.com/40" },
+            { id: 5, name: "Limited Gift", price: 550, image: "https://via.placeholder.com/100", seller: "user5", sellerAvatar: "https://via.placeholder.com/40" },
+            { id: 6, name: "Unique Gift", price: 650, image: "https://via.placeholder.com/100", seller: "user6", sellerAvatar: "https://via.placeholder.com/40" }
+        ];
+        
+        // Sample data for user's gifts
+        const userGifts = [
+            { id: 1, name: "Premium Gift", price: 150, image: "https://via.placeholder.com/100" },
+            { id: 3, name: "Exclusive Gift", price: 350, image: "https://via.placeholder.com/100" }
+        ];
+        
+        // Sample gift options for adding
+        const giftOptions = [
+            { id: 1, name: "Premium Gift", image: "https://via.placeholder.com/100" },
+            { id: 2, name: "Special Gift", image: "https://via.placeholder.com/100" },
+            { id: 3, name: "Exclusive Gift", image: "https://via.placeholder.com/100" },
+            { id: 4, name: "Rare Gift", image: "https://via.placeholder.com/100" },
+            { id: 5, name: "Limited Gift", image: "https://via.placeholder.com/100" },
+            { id: 6, name: "Unique Gift", image: "https://via.placeholder.com/100" }
+        ];
+        
+        // State variables
+        let currentUser = {
+            id: tg.initDataUnsafe.user?.id || "12345",
+            username: tg.initDataUnsafe.user?.username || "telegram_user",
+            firstName: tg.initDataUnsafe.user?.first_name || "Telegram",
+            lastName: tg.initDataUnsafe.user?.last_name || "User",
+            avatar: tg.initDataUnsafe.user?.photo_url || "https://via.placeholder.com/40"
+        };
+        
+        let selectedGiftId = null;
+        let editingGiftId = null;
+        
+        // DOM elements
+        const app = document.getElementById('app');
+        const homePage = document.getElementById('home-page');
+        const profilePage = document.getElementById('profile-page');
+        const profileBtn = document.getElementById('profile-btn');
+        const backBtn = document.getElementById('back-btn');
+        const addGiftBtn = document.getElementById('add-gift-btn');
+        const giftsContainer = document.getElementById('gifts-container');
+        const userGiftsContainer = document.getElementById('user-gifts-container');
+        const noGiftsMessage = document.getElementById('no-gifts-message');
+        const addGiftModal = document.getElementById('add-gift-modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const giftOptionsElements = document.querySelectorAll('.gift-option');
+        const giftPriceInput = document.getElementById('gift-price');
+        const priceError = document.getElementById('price-error');
+        const confirmAddBtn = document.getElementById('confirm-add-btn');
+        const editPriceModal = document.getElementById('edit-price-modal');
+        const closeEditModalBtn = document.getElementById('close-edit-modal-btn');
+        const editGiftPriceInput = document.getElementById('edit-gift-price');
+        const editPriceError = document.getElementById('edit-price-error');
+        const confirmEditBtn = document.getElementById('confirm-edit-btn');
+        const editGiftImage = document.getElementById('edit-gift-image');
+        const editGiftName = document.getElementById('edit-gift-name');
+        const sortSelect = document.getElementById('sort-select');
+        const refreshBtn = document.getElementById('refresh-btn');
+        const loadingMore = document.getElementById('loading-more');
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toast-message');
+        
+        // Initialize the app
+        function initApp() {
+            // Set Telegram theme
+            if (tg.colorScheme === 'dark') {
+                document.body.classList.add('dark');
+            } else {
+                document.body.classList.remove('dark');
+            }
+            
+            // Set user data
+            document.getElementById('user-avatar').src = currentUser.avatar;
+            document.getElementById('profile-avatar').src = currentUser.avatar;
+            document.getElementById('username').textContent = currentUser.username;
+            document.getElementById('profile-username').textContent = currentUser.username;
+            
+            // Load gifts
+            renderGifts(sampleGifts);
+            renderUserGifts(userGifts);
+            
+            // Check if user has any gifts
+            toggleNoGiftsMessage();
+            
+            // Set up event listeners
+            setupEventListeners();
+            
+            // Expand the Web App
+            tg.expand();
+        }
+        
+        // Render gifts on home page
+        function renderGifts(gifts) {
+            giftsContainer.innerHTML = '';
+            
+            gifts.forEach(gift => {
+                const giftCard = document.createElement('div');
+                giftCard.className = 'gift-card bg-gray-800 rounded-xl p-4 border border-gray-700 fade-in';
+                giftCard.innerHTML = `
+                    <div class="flex justify-center mb-4">
+                        <img src="${gift.image}" alt="${gift.name}" class="w-24 h-24 object-contain">
+                    </div>
+                    <h3 class="text-lg font-semibold text-white mb-1 truncate">${gift.name}</h3>
+                    <div class="flex items-center justify-between mb-3">
+                        <div>
+                            <p class="text-gray-400 text-sm">Seller</p>
+                            <div class="flex items-center">
+                                <img src="${gift.sellerAvatar}" alt="Seller" class="w-5 h-5 rounded-full mr-2">
+                                <span class="text-white text-sm">${gift.seller}</span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-gray-400 text-sm">Price</p>
+                            <p class="text-blue-400 font-bold">${gift.price} RUB</p>
+                        </div>
+                    </div>
+                    <button class="w-full btn-primary text-white rounded-lg py-2 font-medium hover:opacity-90 transition buy-btn" data-gift-id="${gift.id}">
+                        Buy Now
+                    </button>
+                `;
+                giftsContainer.appendChild(giftCard);
+            });
+        }
+        
+        // Render user's gifts on profile page
+        function renderUserGifts(gifts) {
+            userGiftsContainer.innerHTML = '';
+            
+            gifts.forEach(gift => {
+                const giftCard = document.createElement('div');
+                giftCard.className = 'gift-card bg-gray-800 rounded-xl p-4 border border-gray-700 fade-in';
+                giftCard.innerHTML = `
+                    <div class="flex justify-center mb-4">
+                        <img src="${gift.image}" alt="${gift.name}" class="w-24 h-24 object-contain">
+                    </div>
+                    <h3 class="text-lg font-semibold text-white mb-1 truncate">${gift.name}</h3>
+                    <div class="mb-3">
+                        <label class="text-gray-400 text-sm">Your Price (RUB)</label>
+                        <div class="flex items-center mt-1">
+                            <input type="number" value="${gift.price}" class="flex-1 bg-gray-700 text-white rounded-l-lg px-3 py-2 border border-gray-600 input-field focus:outline-none focus:border-blue-500 price-input" data-gift-id="${gift.id}" min="1">
+                            <button class="bg-gray-600 text-white rounded-r-lg px-3 py-2 border border-gray-600 hover:bg-gray-500 transition edit-price-btn" data-gift-id="${gift.id}">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <button class="w-full btn-danger text-white rounded-lg py-2 font-medium hover:opacity-90 transition remove-btn" data-gift-id="${gift.id}">
+                        Remove from Sale
+                    </button>
+                `;
+                userGiftsContainer.appendChild(giftCard);
+            });
+            
+            // Add event listeners to the new elements
+            document.querySelectorAll('.remove-btn').forEach(btn => {
+                btn.addEventListener('click', handleRemoveGift);
+            });
+            
+            document.querySelectorAll('.edit-price-btn').forEach(btn => {
+                btn.addEventListener('click', handleEditPrice);
+            });
+            
+            document.querySelectorAll('.price-input').forEach(input => {
+                input.addEventListener('change', handlePriceChange);
+            });
+        }
+        
+        // Toggle "no gifts" message visibility
+        function toggleNoGiftsMessage() {
+            if (userGiftsContainer.children.length === 0) {
+                noGiftsMessage.classList.remove('hidden');
+            } else {
+                noGiftsMessage.classList.add('hidden');
+            }
+        }
+        
+        // Show toast notification
+        function showToast(message, isSuccess = true) {
+            toastMessage.textContent = message;
+            toast.classList.remove('hidden');
+            
+            if (isSuccess) {
+                toast.classList.remove('bg-red-500');
+                toast.classList.add('bg-gray-800');
+            } else {
+                toast.classList.remove('bg-gray-800');
+                toast.classList.add('bg-red-500');
+            }
+            
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+        
+        // Set up event listeners
+        function setupEventListeners() {
+            // Navigation
+            profileBtn.addEventListener('click', () => {
+                homePage.classList.add('hidden');
+                profilePage.classList.remove('hidden');
+            });
+            
+            backBtn.addEventListener('click', () => {
+                profilePage.classList.add('hidden');
+                homePage.classList.remove('hidden');
+            });
+            
+            // Add gift flow
+            addGiftBtn.addEventListener('click', () => {
+                addGiftModal.classList.remove('hidden');
+            });
+            
+            closeModalBtn.addEventListener('click', () => {
+                addGiftModal.classList.add('hidden');
+                selectedGiftId = null;
+                giftPriceInput.value = '';
+                priceError.classList.add('hidden');
+            });
+            
+            giftOptionsElements.forEach(option => {
+                option.addEventListener('click', () => {
+                    // Remove selected class from all options
+                    giftOptionsElements.forEach(opt => {
+                        opt.classList.remove('border-blue-500', 'bg-gray-800');
+                    });
+                    
+                    // Add selected class to clicked option
+                    option.classList.add('border-blue-500', 'bg-gray-800');
+                    selectedGiftId = option.getAttribute('data-gift-id');
+                });
+            });
+            
+            confirmAddBtn.addEventListener('click', () => {
+                const price = giftPriceInput.value.trim();
+                
+                if (!selectedGiftId) {
+                    showToast('Please select a gift', false);
+                    return;
+                }
+                
+                if (!price || isNaN(price) || parseInt(price) < 1) {
+                    priceError.classList.remove('hidden');
+                    return;
+                }
+                
+                priceError.classList.add('hidden');
+                
+                // In a real app, you would send this data to your backend
+                const selectedGift = giftOptions.find(g => g.id.toString() === selectedGiftId);
+                
+                // Add to user's gifts
+                userGifts.push({
+                    id: selectedGift.id,
+                    name: selectedGift.name,
+                    price: parseInt(price),
+                    image: selectedGift.image
+                });
+                
+                // Also add to marketplace (in a real app, this would be handled by the backend)
+                sampleGifts.push({
+                    id: selectedGift.id,
+                    name: selectedGift.name,
+                    price: parseInt(price),
+                    image: selectedGift.image,
+                    seller: currentUser.username,
+                    sellerAvatar: currentUser.avatar
+                });
+                
+                // Update UI
+                renderUserGifts(userGifts);
+                renderGifts(sampleGifts);
+                toggleNoGiftsMessage();
+                
+                // Close modal and show success message
+                addGiftModal.classList.add('hidden');
+                showToast('Gift added to marketplace successfully');
+                
+                // Reset selection
+                selectedGiftId = null;
+                giftPriceInput.value = '';
+                
+                // Remove selected class from all options
+                giftOptionsElements.forEach(opt => {
+                    opt.classList.remove('border-blue-500', 'bg-gray-800');
+                });
+                
+                // Send data to Telegram (in a real app)
+                tg.sendData(JSON.stringify({
+                    action: 'add_gift',
+                    giftId: selectedGift.id,
+                    price: parseInt(price)
+                }));
+            });
+            
+            // Edit price flow
+            closeEditModalBtn.addEventListener('click', () => {
+                editPriceModal.classList.add('hidden');
+                editingGiftId = null;
+                editGiftPriceInput.value = '';
+                editPriceError.classList.add('hidden');
+            });
+            
+            confirmEditBtn.addEventListener('click', () => {
+                const newPrice = editGiftPriceInput.value.trim();
+                
+                if (!newPrice || isNaN(newPrice) || parseInt(newPrice) < 1) {
+                    editPriceError.classList.remove('hidden');
+                    return;
+                }
+                
+                editPriceError.classList.add('hidden');
+                
+                // Update price in user's gifts
+                const userGiftIndex = userGifts.findIndex(g => g.id.toString() === editingGiftId);
+                if (userGiftIndex !== -1) {
+                    userGifts[userGiftIndex].price = parseInt(newPrice);
+                }
+                
+                // Update price in marketplace (in a real app, this would be handled by the backend)
+                const marketGiftIndex = sampleGifts.findIndex(g => 
+                    g.id.toString() === editingGiftId && g.seller === currentUser.username
+                );
+                if (marketGiftIndex !== -1) {
+                    sampleGifts[marketGiftIndex].price = parseInt(newPrice);
+                }
+                
+                // Update UI
+                renderUserGifts(userGifts);
+                renderGifts(sampleGifts);
+                
+                // Close modal and show success message
+                editPriceModal.classList.add('hidden');
+                showToast('Price updated successfully');
+                
+                // Reset editing
+                editingGiftId = null;
+                editGiftPriceInput.value = '';
+                
+                // Send data to Telegram (in a real app)
+                tg.sendData(JSON.stringify({
+                    action: 'edit_price',
+                    giftId: editingGiftId,
+                    newPrice: parseInt(newPrice)
+                }));
+            });
+            
+            // Sort and refresh
+            sortSelect.addEventListener('change', handleSortChange);
+            refreshBtn.addEventListener('click', handleRefresh);
+            
+            // Buy button (home page)
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('buy-btn')) {
+                    const giftId = e.target.getAttribute('data-gift-id');
+                    handleBuyGift(giftId);
+                }
+            });
+        }
+        
+        // Handle remove gift
+        function handleRemoveGift(e) {
+            const giftId = e.target.getAttribute('data-gift-id');
+            
+            // Remove from user's gifts
+            const userGiftIndex = userGifts.findIndex(g => g.id.toString() === giftId);
+            if (userGiftIndex !== -1) {
+                userGifts.splice(userGiftIndex, 1);
+            }
+            
+            // Remove from marketplace (in a real app, this would be handled by the backend)
+            const marketGiftIndex = sampleGifts.findIndex(g => 
+                g.id.toString() === giftId && g.seller === currentUser.username
+            );
+            if (marketGiftIndex !== -1) {
+                sampleGifts.splice(marketGiftIndex, 1);
+            }
+            
+            // Update UI
+            renderUserGifts(userGifts);
+            renderGifts(sampleGifts);
+            toggleNoGiftsMessage();
+            
+            // Show success message
+            showToast('Gift removed from marketplace');
+            
+            // Send data to Telegram (in a real app)
+            tg.sendData(JSON.stringify({
+                action: 'remove_gift',
+                giftId: giftId
+            }));
+        }
+        
+        // Handle edit price
+        function handleEditPrice(e) {
+            const giftId = e.target.getAttribute('data-gift-id');
+            const gift = userGifts.find(g => g.id.toString() === giftId);
+            
+            if (gift) {
+                editingGiftId = giftId;
+                editGiftImage.src = gift.image;
+                editGiftName.textContent = gift.name;
+                editGiftPriceInput.value = gift.price;
+                editPriceModal.classList.remove('hidden');
+            }
+        }
+        
+        // Handle price change (direct input)
+        function handlePriceChange(e) {
+            const giftId = e.target.getAttribute('data-gift-id');
+            const newPrice = e.target.value.trim();
+            
+            if (!newPrice || isNaN(newPrice) || parseInt(newPrice) < 1) {
+                showToast('Please enter a valid price (minimum 1 RUB)', false);
+                return;
+            }
+            
+            // Update price in user's gifts
+            const userGiftIndex = userGifts.findIndex(g => g.id.toString() === giftId);
+            if (userGiftIndex !== -1) {
+                userGifts[userGiftIndex].price = parseInt(newPrice);
+            }
+            
+            // Update price in marketplace (in a real app, this would be handled by the backend)
+            const marketGiftIndex = sampleGifts.findIndex(g => 
+                g.id.toString() === giftId && g.seller === currentUser.username
+            );
+            if (marketGiftIndex !== -1) {
+                sampleGifts[marketGiftIndex].price = parseInt(newPrice);
+            }
+            
+            // Update UI
+            renderGifts(sampleGifts);
+            
+            // Show success message
+            showToast('Price updated successfully');
+            
+            // Send data to Telegram (in a real app)
+            tg.sendData(JSON.stringify({
+                action: 'edit_price',
+                giftId: giftId,
+                newPrice: parseInt(newPrice)
+            }));
+        }
+        
+        // Handle buy gift
+        function handleBuyGift(giftId) {
+            const gift = sampleGifts.find(g => g.id.toString() === giftId);
+            
+            if (gift) {
+                // In a real app, you would initiate a payment process here
+                showToast(`Purchased ${gift.name} for ${gift.price} RUB`);
+                
+                // Send data to Telegram (in a real app)
+                tg.sendData(JSON.stringify({
+                    action: 'buy_gift',
+                    giftId: giftId,
+                    price: gift.price,
+                    seller: gift.seller
+                }));
+            }
+        }
+        
+        // Handle sort change
+        function handleSortChange() {
+            const sortValue = sortSelect.value;
+            let sortedGifts = [...sampleGifts];
+            
+            switch (sortValue) {
+                case 'price-asc':
+                    sortedGifts.sort((a, b) => a.price - b.price);
+                    break;
+                case 'price-desc':
+                    sortedGifts.sort((a, b) => b.price - a.price);
+                    break;
+                case 'newest':
+                    // In a real app, you would sort by date added
+                    sortedGifts.reverse();
+                    break;
+                default:
+                    break;
+            }
+            
+            renderGifts(sortedGifts);
+        }
+        
+        // Handle refresh
+        function handleRefresh() {
+            // Show loading spinner
+            loadingMore.classList.remove('hidden');
+            
+            // In a real app, you would fetch fresh data from the backend
+            setTimeout(() => {
+                renderGifts(sampleGifts);
+                loadingMore.classList.add('hidden');
+                showToast('Gift list refreshed');
+            }, 1000);
+        }
+        
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
