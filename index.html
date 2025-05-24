@@ -164,20 +164,8 @@
 
                     <div class="mb-6">
                         <label class="block text-gray-400 mb-2">Select Gift</label>
-                        <div class="grid grid-cols-3 gap-3">
-                            <!-- Sample gift options -->
-                            <div class="gift-option cursor-pointer p-3 rounded-lg border border-gray-800 hover:border-blue-500 transition" data-gift-id="1">
-                                <img src="https://via.placeholder.com/100" alt="Gift" class="w-full h-20 object-contain mb-2">
-                                <p class="text-center text-sm text-white">Premium Gift</p>
-                            </div>
-                            <div class="gift-option cursor-pointer p-3 rounded-lg border border-gray-800 hover:border-blue-500 transition" data-gift-id="2">
-                                <img src="https://via.placeholder.com/100" alt="Gift" class="w-full h-20 object-contain mb-2">
-                                <p class="text-center text-sm text-white">Special Gift</p>
-                            </div>
-                            <div class="gift-option cursor-pointer p-3 rounded-lg border border-gray-800 hover:border-blue-500 transition" data-gift-id="3">
-                                <img src="https://via.placeholder.com/100" alt="Gift" class="w-full h-20 object-contain mb-2">
-                                <p class="text-center text-sm text-white">Exclusive Gift</p>
-                            </div>
+                        <div class="grid grid-cols-3 gap-3" id="gift-options-container">
+                            <!-- Gift options will be inserted here by JavaScript -->
                         </div>
                     </div>
 
@@ -236,32 +224,6 @@
         // Initialize Telegram Web App
         const tg = window.Telegram.WebApp;
         
-        // Sample data for gifts
-        const sampleGifts = [
-            { id: 1, name: "Premium Gift", price: 150, image: "https://via.placeholder.com/100", seller: "user1", sellerAvatar: "https://via.placeholder.com/40" },
-            { id: 2, name: "Special Gift", price: 250, image: "https://via.placeholder.com/100", seller: "user2", sellerAvatar: "https://via.placeholder.com/40" },
-            { id: 3, name: "Exclusive Gift", price: 350, image: "https://via.placeholder.com/100", seller: "user3", sellerAvatar: "https://via.placeholder.com/40" },
-            { id: 4, name: "Rare Gift", price: 450, image: "https://via.placeholder.com/100", seller: "user4", sellerAvatar: "https://via.placeholder.com/40" },
-            { id: 5, name: "Limited Gift", price: 550, image: "https://via.placeholder.com/100", seller: "user5", sellerAvatar: "https://via.placeholder.com/40" },
-            { id: 6, name: "Unique Gift", price: 650, image: "https://via.placeholder.com/100", seller: "user6", sellerAvatar: "https://via.placeholder.com/40" }
-        ];
-        
-        // Sample data for user's gifts
-        const userGifts = [
-            { id: 1, name: "Premium Gift", price: 150, image: "https://via.placeholder.com/100" },
-            { id: 3, name: "Exclusive Gift", price: 350, image: "https://via.placeholder.com/100" }
-        ];
-        
-        // Sample gift options for adding
-        const giftOptions = [
-            { id: 1, name: "Premium Gift", image: "https://via.placeholder.com/100" },
-            { id: 2, name: "Special Gift", image: "https://via.placeholder.com/100" },
-            { id: 3, name: "Exclusive Gift", image: "https://via.placeholder.com/100" },
-            { id: 4, name: "Rare Gift", image: "https://via.placeholder.com/100" },
-            { id: 5, name: "Limited Gift", image: "https://via.placeholder.com/100" },
-            { id: 6, name: "Unique Gift", image: "https://via.placeholder.com/100" }
-        ];
-        
         // State variables
         let currentUser = {
             id: tg.initDataUnsafe.user?.id || "12345",
@@ -270,6 +232,11 @@
             lastName: tg.initDataUnsafe.user?.last_name || "User",
             avatar: tg.initDataUnsafe.user?.photo_url || "https://via.placeholder.com/40"
         };
+        
+        // Store gifts data
+        let allGifts = []; // All gifts in marketplace
+        let userGifts = []; // User's gifts for sale
+        let availableGifts = []; // Gifts available for adding
         
         let selectedGiftId = null;
         let editingGiftId = null;
@@ -286,7 +253,7 @@
         const noGiftsMessage = document.getElementById('no-gifts-message');
         const addGiftModal = document.getElementById('add-gift-modal');
         const closeModalBtn = document.getElementById('close-modal-btn');
-        const giftOptionsElements = document.querySelectorAll('.gift-option');
+        const giftOptionsContainer = document.getElementById('gift-options-container');
         const giftPriceInput = document.getElementById('gift-price');
         const priceError = document.getElementById('price-error');
         const confirmAddBtn = document.getElementById('confirm-add-btn');
@@ -304,7 +271,7 @@
         const toastMessage = document.getElementById('toast-message');
         
         // Initialize the app
-        function initApp() {
+        async function initApp() {
             // Set Telegram theme
             if (tg.colorScheme === 'dark') {
                 document.body.classList.add('dark');
@@ -318,9 +285,13 @@
             document.getElementById('username').textContent = currentUser.username;
             document.getElementById('profile-username').textContent = currentUser.username;
             
-            // Load gifts
-            renderGifts(sampleGifts);
+            // Load gifts data
+            await loadGiftsData();
+            
+            // Render UI
+            renderGifts(allGifts);
             renderUserGifts(userGifts);
+            renderAvailableGiftOptions(availableGifts);
             
             // Check if user has any gifts
             toggleNoGiftsMessage();
@@ -330,11 +301,103 @@
             
             // Expand the Web App
             tg.expand();
+            
+            // Request Telegram premium status to get available gifts
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.requestPremiumStatus();
+            }
+        }
+        
+        // Load gifts data (simulating API calls)
+        async function loadGiftsData() {
+            // In a real app, you would fetch this from your backend API
+            // For demo purposes, we're using mock data
+            
+            // Mock available gifts (premium stickers/gifts from Telegram)
+            availableGifts = [
+                { id: "premium1", name: "Premium Gift 1", image: "https://via.placeholder.com/100/3a7bd5/ffffff?text=Gift+1" },
+                { id: "premium2", name: "Premium Gift 2", image: "https://via.placeholder.com/100/00d2ff/ffffff?text=Gift+2" },
+                { id: "premium3", name: "Premium Gift 3", image: "https://via.placeholder.com/100/11998e/ffffff?text=Gift+3" },
+                { id: "premium4", name: "Premium Gift 4", image: "https://via.placeholder.com/100/38ef7d/ffffff?text=Gift+4" },
+                { id: "premium5", name: "Premium Gift 5", image: "https://via.placeholder.com/100/ff416c/ffffff?text=Gift+5" },
+                { id: "premium6", name: "Premium Gift 6", image: "https://via.placeholder.com/100/ff4b2b/ffffff?text=Gift+6" }
+            ];
+            
+            // Mock marketplace gifts
+            allGifts = [
+                { 
+                    id: "market1", 
+                    name: "Premium Gift 1", 
+                    price: 150, 
+                    image: "https://via.placeholder.com/100/3a7bd5/ffffff?text=Gift+1",
+                    seller: "user1", 
+                    sellerAvatar: "https://via.placeholder.com/40/3a7bd5/ffffff?text=U1" 
+                },
+                { 
+                    id: "market2", 
+                    name: "Premium Gift 2", 
+                    price: 250, 
+                    image: "https://via.placeholder.com/100/00d2ff/ffffff?text=Gift+2",
+                    seller: "user2", 
+                    sellerAvatar: "https://via.placeholder.com/40/00d2ff/ffffff?text=U2" 
+                },
+                { 
+                    id: "market3", 
+                    name: "Premium Gift 3", 
+                    price: 350, 
+                    image: "https://via.placeholder.com/100/11998e/ffffff?text=Gift+3",
+                    seller: "user3", 
+                    sellerAvatar: "https://via.placeholder.com/40/11998e/ffffff?text=U3" 
+                }
+            ];
+            
+            // Mock user's gifts (in a real app, this would come from backend)
+            userGifts = [
+                { id: "premium1", name: "Premium Gift 1", price: 150, image: "https://via.placeholder.com/100/3a7bd5/ffffff?text=Gift+1" },
+                { id: "premium3", name: "Premium Gift 3", price: 350, image: "https://via.placeholder.com/100/11998e/ffffff?text=Gift+3" }
+            ];
+            
+            // In a real app, you would also fetch the user's actual Telegram premium gifts
+            // This requires Telegram WebApp API integration
+            try {
+                // This is a placeholder for actual Telegram premium gifts integration
+                // In reality, you would need to use Telegram's API to get the user's premium gifts
+                const telegramGifts = await getTelegramPremiumGifts();
+                if (telegramGifts && telegramGifts.length > 0) {
+                    // Merge with available gifts
+                    availableGifts = [...availableGifts, ...telegramGifts];
+                }
+            } catch (error) {
+                console.error("Error fetching Telegram premium gifts:", error);
+            }
+        }
+        
+        // Placeholder function to get Telegram premium gifts
+        async function getTelegramPremiumGifts() {
+            // In a real implementation, this would use Telegram WebApp API
+            // Currently, Telegram doesn't provide direct API for this, so we return mock data
+            return [
+                { id: "tg1", name: "Telegram Premium Gift 1", image: "https://via.placeholder.com/100/8a2be2/ffffff?text=TG+1" },
+                { id: "tg2", name: "Telegram Premium Gift 2", image: "https://via.placeholder.com/100/9932cc/ffffff?text=TG+2" }
+            ];
         }
         
         // Render gifts on home page
         function renderGifts(gifts) {
             giftsContainer.innerHTML = '';
+            
+            if (gifts.length === 0) {
+                giftsContainer.innerHTML = `
+                    <div class="col-span-full text-center py-12">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                        </svg>
+                        <h3 class="text-xl font-medium text-gray-400 mb-2">No gifts available</h3>
+                        <p class="text-gray-500">Check back later or add your own gifts</p>
+                    </div>
+                `;
+                return;
+            }
             
             gifts.forEach(gift => {
                 const giftCard = document.createElement('div');
@@ -409,9 +472,37 @@
             });
         }
         
+        // Render available gift options in the add gift modal
+        function renderAvailableGiftOptions(gifts) {
+            giftOptionsContainer.innerHTML = '';
+            
+            gifts.forEach(gift => {
+                const giftOption = document.createElement('div');
+                giftOption.className = 'gift-option cursor-pointer p-3 rounded-lg border border-gray-800 hover:border-blue-500 transition';
+                giftOption.setAttribute('data-gift-id', gift.id);
+                giftOption.innerHTML = `
+                    <img src="${gift.image}" alt="${gift.name}" class="w-full h-20 object-contain mb-2">
+                    <p class="text-center text-sm text-white">${gift.name}</p>
+                `;
+                giftOptionsContainer.appendChild(giftOption);
+                
+                // Add click event
+                giftOption.addEventListener('click', () => {
+                    // Remove selected class from all options
+                    document.querySelectorAll('.gift-option').forEach(opt => {
+                        opt.classList.remove('border-blue-500', 'bg-gray-800');
+                    });
+                    
+                    // Add selected class to clicked option
+                    giftOption.classList.add('border-blue-500', 'bg-gray-800');
+                    selectedGiftId = gift.id;
+                });
+            });
+        }
+        
         // Toggle "no gifts" message visibility
         function toggleNoGiftsMessage() {
-            if (userGiftsContainer.children.length === 0) {
+            if (userGifts.length === 0) {
                 noGiftsMessage.classList.remove('hidden');
             } else {
                 noGiftsMessage.classList.add('hidden');
@@ -461,19 +552,6 @@
                 priceError.classList.add('hidden');
             });
             
-            giftOptionsElements.forEach(option => {
-                option.addEventListener('click', () => {
-                    // Remove selected class from all options
-                    giftOptionsElements.forEach(opt => {
-                        opt.classList.remove('border-blue-500', 'bg-gray-800');
-                    });
-                    
-                    // Add selected class to clicked option
-                    option.classList.add('border-blue-500', 'bg-gray-800');
-                    selectedGiftId = option.getAttribute('data-gift-id');
-                });
-            });
-            
             confirmAddBtn.addEventListener('click', () => {
                 const price = giftPriceInput.value.trim();
                 
@@ -489,30 +567,36 @@
                 
                 priceError.classList.add('hidden');
                 
-                // In a real app, you would send this data to your backend
-                const selectedGift = giftOptions.find(g => g.id.toString() === selectedGiftId);
+                // Find the selected gift
+                const selectedGift = availableGifts.find(g => g.id === selectedGiftId);
+                
+                if (!selectedGift) {
+                    showToast('Selected gift not found', false);
+                    return;
+                }
                 
                 // Add to user's gifts
-                userGifts.push({
+                const newUserGift = {
                     id: selectedGift.id,
                     name: selectedGift.name,
                     price: parseInt(price),
                     image: selectedGift.image
-                });
+                };
                 
-                // Also add to marketplace (in a real app, this would be handled by the backend)
-                sampleGifts.push({
-                    id: selectedGift.id,
-                    name: selectedGift.name,
-                    price: parseInt(price),
-                    image: selectedGift.image,
+                userGifts.push(newUserGift);
+                
+                // Also add to marketplace
+                const newMarketGift = {
+                    ...newUserGift,
                     seller: currentUser.username,
                     sellerAvatar: currentUser.avatar
-                });
+                };
+                
+                allGifts.push(newMarketGift);
                 
                 // Update UI
                 renderUserGifts(userGifts);
-                renderGifts(sampleGifts);
+                renderGifts(allGifts);
                 toggleNoGiftsMessage();
                 
                 // Close modal and show success message
@@ -524,7 +608,7 @@
                 giftPriceInput.value = '';
                 
                 // Remove selected class from all options
-                giftOptionsElements.forEach(opt => {
+                document.querySelectorAll('.gift-option').forEach(opt => {
                     opt.classList.remove('border-blue-500', 'bg-gray-800');
                 });
                 
@@ -555,22 +639,22 @@
                 editPriceError.classList.add('hidden');
                 
                 // Update price in user's gifts
-                const userGiftIndex = userGifts.findIndex(g => g.id.toString() === editingGiftId);
+                const userGiftIndex = userGifts.findIndex(g => g.id === editingGiftId);
                 if (userGiftIndex !== -1) {
                     userGifts[userGiftIndex].price = parseInt(newPrice);
                 }
                 
-                // Update price in marketplace (in a real app, this would be handled by the backend)
-                const marketGiftIndex = sampleGifts.findIndex(g => 
-                    g.id.toString() === editingGiftId && g.seller === currentUser.username
+                // Update price in marketplace
+                const marketGiftIndex = allGifts.findIndex(g => 
+                    g.id === editingGiftId && g.seller === currentUser.username
                 );
                 if (marketGiftIndex !== -1) {
-                    sampleGifts[marketGiftIndex].price = parseInt(newPrice);
+                    allGifts[marketGiftIndex].price = parseInt(newPrice);
                 }
                 
                 // Update UI
                 renderUserGifts(userGifts);
-                renderGifts(sampleGifts);
+                renderGifts(allGifts);
                 
                 // Close modal and show success message
                 editPriceModal.classList.add('hidden');
@@ -606,22 +690,22 @@
             const giftId = e.target.getAttribute('data-gift-id');
             
             // Remove from user's gifts
-            const userGiftIndex = userGifts.findIndex(g => g.id.toString() === giftId);
+            const userGiftIndex = userGifts.findIndex(g => g.id === giftId);
             if (userGiftIndex !== -1) {
                 userGifts.splice(userGiftIndex, 1);
             }
             
-            // Remove from marketplace (in a real app, this would be handled by the backend)
-            const marketGiftIndex = sampleGifts.findIndex(g => 
-                g.id.toString() === giftId && g.seller === currentUser.username
+            // Remove from marketplace
+            const marketGiftIndex = allGifts.findIndex(g => 
+                g.id === giftId && g.seller === currentUser.username
             );
             if (marketGiftIndex !== -1) {
-                sampleGifts.splice(marketGiftIndex, 1);
+                allGifts.splice(marketGiftIndex, 1);
             }
             
             // Update UI
             renderUserGifts(userGifts);
-            renderGifts(sampleGifts);
+            renderGifts(allGifts);
             toggleNoGiftsMessage();
             
             // Show success message
@@ -637,7 +721,7 @@
         // Handle edit price
         function handleEditPrice(e) {
             const giftId = e.target.getAttribute('data-gift-id');
-            const gift = userGifts.find(g => g.id.toString() === giftId);
+            const gift = userGifts.find(g => g.id === giftId);
             
             if (gift) {
                 editingGiftId = giftId;
@@ -659,21 +743,21 @@
             }
             
             // Update price in user's gifts
-            const userGiftIndex = userGifts.findIndex(g => g.id.toString() === giftId);
+            const userGiftIndex = userGifts.findIndex(g => g.id === giftId);
             if (userGiftIndex !== -1) {
                 userGifts[userGiftIndex].price = parseInt(newPrice);
             }
             
-            // Update price in marketplace (in a real app, this would be handled by the backend)
-            const marketGiftIndex = sampleGifts.findIndex(g => 
-                g.id.toString() === giftId && g.seller === currentUser.username
+            // Update price in marketplace
+            const marketGiftIndex = allGifts.findIndex(g => 
+                g.id === giftId && g.seller === currentUser.username
             );
             if (marketGiftIndex !== -1) {
-                sampleGifts[marketGiftIndex].price = parseInt(newPrice);
+                allGifts[marketGiftIndex].price = parseInt(newPrice);
             }
             
             // Update UI
-            renderGifts(sampleGifts);
+            renderGifts(allGifts);
             
             // Show success message
             showToast('Price updated successfully');
@@ -688,7 +772,7 @@
         
         // Handle buy gift
         function handleBuyGift(giftId) {
-            const gift = sampleGifts.find(g => g.id.toString() === giftId);
+            const gift = allGifts.find(g => g.id === giftId);
             
             if (gift) {
                 // In a real app, you would initiate a payment process here
@@ -707,7 +791,7 @@
         // Handle sort change
         function handleSortChange() {
             const sortValue = sortSelect.value;
-            let sortedGifts = [...sampleGifts];
+            let sortedGifts = [...allGifts];
             
             switch (sortValue) {
                 case 'price-asc':
@@ -734,7 +818,7 @@
             
             // In a real app, you would fetch fresh data from the backend
             setTimeout(() => {
-                renderGifts(sampleGifts);
+                renderGifts(allGifts);
                 loadingMore.classList.add('hidden');
                 showToast('Gift list refreshed');
             }, 1000);
