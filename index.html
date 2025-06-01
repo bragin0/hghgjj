@@ -1,1 +1,633 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StarsBot - Купить Telegram Stars</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6D28D9',
+                        secondary: '#8B5CF6',
+                        dark: '#1E1B4B',
+                        light: '#F5F3FF',
+                        accent: '#A78BFA'
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    body {
+        font-family: 'Inter', sans-serif;
+        min-height: 100vh;
+        position: relative;
+    }
+body.stars-bg {
+    background: #1E1B4B; /* Резервный цвет */
+    background: linear-gradient(135deg, #1E1B4B 0%, #4C1D95 100%), 
+                url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 0c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zM11 78c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 0c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zM11 48c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 0c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7z' fill='%238B5CF6' fill-opacity='0.05' fill-rule='evenodd'/%3E%3Ccircle cx='50' cy='50' r='5' fill='%23FFFFFF' fill-opacity='0.1'/%3E%3Ccircle cx='20' cy='20' r='5' fill='%23FFFFFF' fill-opacity='0.1'/%3E%3Ccircle cx='80' cy='30' r='4' fill='%23FFFFFF' fill-opacity='0.15'/%3E%3Ccircle cx='30' cy='70' r='6' fill='%23FFFFFF' fill-opacity='0.1'/%3E%3Ccircle cx='70' cy='60' r='3' fill='%23FFFFFF' fill-opacity='0.12'/%3E%3C/svg%3E");
+    background-attachment: fixed;
+    background-size: cover, 100px 100px;
+    background-repeat: no-repeat, repeat;
+}
+    
+    .message-container {
+        height: calc(100vh - 400px);
+        scroll-behavior: smooth;
+    }
+    .chat-bubble {
+        animation: fadeIn 0.3s ease-in-out;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .typing-indicator {
+        display: inline-flex;
+        align-items: center;
+    }
+    .typing-dot {
+        width: 8px;
+        height: 8px;
+        background-color: #8B5CF6;
+        border-radius: 50%;
+        margin: 0 3px;
+        animation: pulse 1.5s infinite;
+    }
+    .typing-dot:nth-child(2) {
+        animation-delay: 0.5s;
+    }
+    .typing-dot:nth-child(3) {
+        animation-delay: 1s;
+    }
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.2); opacity: 0.7; }
+    }
+    .wave {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        overflow: hidden;
+        line-height: 0;
+        transform: rotate(180deg);
+        z-index: 0;
+    }
+    .wave svg {
+        position: relative;
+        display: block;
+        width: calc(100% + 1.3px);
+        height: 73px;
+    }
+    .wave .shape-fill {
+        fill: #1E1B4B;
+    }
+    .wave path:nth-child(1) {
+        animation: wave1 10s linear infinite;
+    }
+    .wave path:nth-child(2) {
+        animation: wave2 8s linear infinite;
+    }
+    .wave path:nth-child(3) {
+        animation: wave3 6s linear infinite;
+    }
+    @keyframes wave1 {
+        0% { transform: translateX(0); }
+        50% { transform: translateX(-100px); }
+        100% { transform: translateX(0); }
+    }
+    @keyframes wave2 {
+        0% { transform: translateX(0); }
+        50% { transform: translateX(80px); }
+        100% { transform: translateX(0); }
+    }
+    @keyframes wave3 {
+        0% { transform: translateX(0); }
+        50% { transform: translateX(-120px); }
+        100% { transform: translateX(0); }
+    }
+    .chat-bubble .qr-code {
+        width: 250px !important;
+        height: 250px !important;
+        border: 8px solid white;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        margin: 0 auto;
+    }
+    .chat-bubble code {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 2px 6px;
+        border-radius: 4px;
+        word-break: break-all;
+    }
+    .chat-bubble button {
+        padding: 6px 12px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        transition: color 0.3s;
+    }
+    .chat-bubble button:hover {
+        color: #A78BFA;
+    }
+</style>
+</head>
+<body class="stars-bg">
+    <!-- Wave divider -->
+    <div class="wave">
+        <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" class="shape-fill"></path>
+            <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5" class="shape-fill"></path>
+            <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" class="shape-fill"></path>
+        </svg>
+    </div>
+    
+    <div class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <header class="py-6 px-4 sm:px-6 backdrop-blur-sm bg-dark/80 border-b border-accent/30">
+            <div class="max-w-3xl mx-auto flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center">
+                        <i class="fas fa-star text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-white">StarsBot</h1>
+                        <p class="text-xs text-light/60">Купить Telegram Stars</p>
+                    </div>
+                </div>
+                <button id="adminBtn" class="px-4 py-2 bg-dark/60 border border-accent/30 rounded-lg text-accent font-medium hover:bg-primary/40 transition">
+                    <i class="fas fa-user-shield mr-2"></i>Админ
+                </button>
+            </div>
+        </header>
+        
+        <!-- Chat container -->
+        <main class="flex-1 py-6 px-4 sm:px-6">
+            <div class="max-w-3xl mx-auto">
+                <div id="messages" class="message-container space-y-4 overflow-y-auto mb-6">
+                    <!-- Messages will be displayed here -->
+                    
+                    <!-- Welcome message -->
+                    <div class="chat-bubble bg-gradient-to-r from-dark to-dark/90 p-5 rounded-2xl rounded-tl-none shadow-lg">
+                        <div class="text-white">
+                            <div class="font-bold text-lg flex items-center">
+                                <div class="w-6 h-6 rounded-full bg-primary flex items-center justify-center mr-2">
+                                    <i class="fas fa-robot text-xs"></i>
+                                </div>
+                                StarsBot
+                            </div>
+                            <div class="mt-3 space-y-3">
+                                <p>👋 <span class="font-bold">Добро пожаловать в StarsBot!</span></p>
+                                <p>Я помогу вам купить <span class="font-bold">Telegram Stars</span> быстро и удобно!</p>
+                                <div class="bg-dark/50 p-3 rounded-lg">
+                                    <p class="text-sm">
+                                        <span class="text-accent">🔹 Минимальная покупка:</span> 50 звёзд<br>
+                                        <span class="text-accent">🔹 Максимальная покупка:</span> 25000 звёзд
+                                    </p>
+                                </div>
+                                <p class="pt-2">Выберите, кому хотите купить звёзды:</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Buttons -->
+                <div id="actionButtons" class="grid grid-cols-2 gap-3 mb-6">
+                    <button onclick="selectOption('buy_self')" class="option-btn bg-gradient-to-r from-primary to-primary/90 hover:from-primary/80 hover:to-primary/70 text-white py-4 px-4 rounded-xl flex flex-col items-center justify-center transition transform hover:scale-[1.02] shadow-lg">
+                        <div class="w-12 h-12 rounded-full bg-light/10 flex items-center justify-center mb-2">
+                            <i class="fas fa-user text-2xl"></i>
+                        </div>
+                        <span class="font-medium">Купить себе</span>
+                    </button>
+                    <button onclick="selectOption('buy_friend')" class="option-btn bg-gradient-to-r from-secondary to-secondary/90 hover:from-secondary/80 hover:to-secondary/70 text-white py-4 px-4 rounded-xl flex flex-col items-center justify-center transition transform hover:scale-[1.02] shadow-lg">
+                        <div class="w-12 h-12 rounded-full bg-light/10 flex items-center justify-center mb-2">
+                            <i class="fas fa-gift text-2xl"></i>
+                        </div>
+                        <span class="font-medium">Купить другу</span>
+                    </button>
+                </div>
+                
+                <!-- Input area -->
+                <div class="bg-dark/60 border border-accent/30 rounded-xl p-4 backdrop-blur-sm">
+                    <div id="inputArea">
+                        <!-- Input will be displayed conditionally -->
+                    </div>
+                </div>
+            </div>
+        </main>
+            <script>
+                // State management
+                const state = {
+                    current: 'start',
+                    recipientType: '', // self or friend
+                    quantity: 0,
+                    recipient: '',
+                    memo: '',
+                    amount: 0,
+                    isAdmin: false,
+                    markupPercent: 20.0,
+                    adminId: '511301057' // Замените на реальный Telegram ID администратора
+                };
 
+                // Инициализация Telegram Web App
+                window.addEventListener('load', function() {
+                    const messagesContainer = document.getElementById('messages');
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    
+                    // Store sample username if not exists
+                    if (!localStorage.getItem('tg_username')) {
+                        localStorage.setItem('tg_username', 'username123');
+                    }
+
+                    // Проверка, является ли пользователь администратором
+                    const adminButton = document.getElementById('adminBtn');
+                    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
+                        const userId = window.Telegram.WebApp.initDataUnsafe.user.id.toString();
+                        if (!state.adminIds.includes(userId)) {
+                            adminButton.style.display = 'none'; // Скрываем кнопку для не-админов
+                        }
+                    } else {
+                        adminButton.style.display = 'none'; // Скрываем кнопку, если не в Telegram Mini App
+                    }
+                });
+
+                // Generate random memo
+                function generateMemo() {
+                    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+                    let memo = '';
+                    for (let i = 0; i < 8; i++) {
+                        memo += chars.charAt(Math.floor(Math.random() * chars.length));
+                    }
+                    return memo;
+                }
+
+                // Display typing indicator
+                function showTyping() {
+                    const messagesContainer = document.getElementById('messages');
+                    
+                    const typingIndicator = document.createElement('div');
+                    typingIndicator.classList.add('chat-bubble', 'bg-dark/60', 'p-4', 'rounded-2xl', 'rounded-tl-none', 'shadow');
+                    typingIndicator.innerHTML = `
+                        <div class="flex items-center">
+                            <div class="w-6 h-6 rounded-full bg-primary flex items-center justify-center mr-3">
+                                <i class="fas fa-robot text-xs text-white"></i>
+                            </div>
+                            <div class="typing-indicator">
+                                <div class="typing-dot"></div>
+                                <div class="typing-dot"></div>
+                                <div class="typing-dot"></div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    messagesContainer.appendChild(typingIndicator);
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    
+                    return typingIndicator;
+                }
+
+                // Hide typing indicator
+                function hideTyping(typingElement) {
+                    typingElement.remove();
+                }
+
+                // Add a message to the chat
+                function addMessage(text, isUser = false) {
+                    const messagesContainer = document.getElementById('messages');
+                    const typingElement = showTyping();
+                    
+                    setTimeout(() => {
+                        hideTyping(typingElement);
+                        
+                        const messageDiv = document.createElement('div');
+                        messageDiv.classList.add('chat-bubble');
+                        
+                        if (isUser) {
+                            messageDiv.classList.add('ml-10', 'bg-dark/40', 'border', 'border-accent/20', 'rounded-2xl', 'rounded-tr-none');
+                            messageDiv.innerHTML = `
+                                <div class="text-white flex items-start">
+                                    <div class="w-8 h-8 rounded-full bg-secondary flex items-center justify-center mr-3">
+                                        <i class="fas fa-user text-sm"></i>
+                                    </div>
+                                    <div class="pt-1">${text}</div>
+                                </div>
+                            `;
+                        } else {
+                            messageDiv.classList.add('bg-gradient-to-r', 'from-dark', 'to-dark/90', 'p-5', 'rounded-2xl', 'rounded-tl-none', 'shadow-lg');
+                            messageDiv.innerHTML = `
+                                <div class="text-white">
+                                    <div class="font-bold text-lg flex items-center">
+                                        <div class="w-6 h-6 rounded-full bg-primary flex items-center justify-center mr-2">
+                                            <i class="fas fa-robot text-xs"></i>
+                                        </div>
+                                        StarsBot
+                                    </div>
+                                    <div class="mt-3">${text}</div>
+                                </div>
+                            `;
+                        }
+                        
+                        messagesContainer.appendChild(messageDiv);
+                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    }, 1000);
+                }
+
+                // Generate QR code
+                function generateQRCode(text, elementId) {
+                    const qrElement = document.getElementById(elementId);
+                    qrElement.innerHTML = '';
+                    QRCode.toCanvas(qrElement, text, {
+                        width: 250,
+                        height: 250,
+                        margin: 0,
+                        color: {
+                            dark: '#1E1B4B',
+                            light: '#FFFFFF'
+                        }
+                    });
+                }
+
+                // Calculate stars price
+                function calculatePrice(quantity) {
+                    // Simple mock calculation
+                    const basePrice = quantity / 100;
+                    const markup = basePrice * (state.markupPercent / 100);
+                    return (basePrice + markup).toFixed(3);
+                }
+
+                // Handle option selection
+                function selectOption(option) {
+                    if (option === 'buy_self' || option === 'buy_friend') {
+                        state.recipientType = option;
+                        state.current = 'quantity';
+                        addMessage(option === 'buy_self' 
+                            ? "🌟 Купить звёзды себе<br><br>Введите количество звёзд (от 50 до 25000):" 
+                            : "🎁 Купить звёзды другу<br><br>Введите количество звёзд (от 50 до 25000):");
+                        
+                        document.getElementById('inputArea').innerHTML = `
+                            <div class="flex">
+                                <input type="number" id="quantityInput" min="50" max="25000" placeholder="Например: 500" class="flex-1 bg-dark/40 border border-accent/30 text-white rounded-l-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent/50">
+                                <button onclick="submitQuantity()" class="bg-primary hover:bg-primary/90 text-white px-5 rounded-r-xl transition">
+                                    <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        `;
+                    } else if (option === 'admin_menu') {
+                        state.isAdmin = true;
+                        state.current = 'admin_menu';
+                        addMessage(`👨‍💼 Админ-панель<br><br>Текущий процент наценки: <strong>${state.markupPercent}%</strong><br>Выберите действие:`);
+                        
+                        document.getElementById('actionButtons').innerHTML = `
+                            <button onclick="selectOption('change_markup')" class="bg-gradient-to-r from-primary to-primary/90 hover:from-primary/80 hover:to-primary/70 text-white py-4 px-4 rounded-xl flex flex-col items-center justify-center transition transform hover:scale-[1.02] shadow-lg">
+                                <div class="w-12 h-12 rounded-full bg-light/10 flex items-center justify-center mb-2">
+                                    <i class="fas fa-percent text-2xl"></i>
+                                </div>
+                                <span class="font-medium">Изменить наценку</span>
+                            </button>
+                        `;
+                    } else if (option === 'change_markup') {
+                        state.current = 'markup_percent';
+                        addMessage(`📈 Изменение процента наценки<br><br>Текущий процент: <strong>${state.markupPercent}%</strong><br>Введите новый процент (например: <code>30</code> для 30%):`);
+                        
+                        document.getElementById('inputArea').innerHTML = `
+                            <div class="flex">
+                                <input type="number" id="percentInput" min="0" step="1" placeholder="Введите новый процент" class="flex-1 bg-dark/40 border border-accent/30 text-white rounded-l-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent/50">
+                                <button onclick="submitMarkupPercent()" class="bg-primary hover:bg-primary/90 text-white px-5 rounded-r-xl transition">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                            </div>
+                        `;
+                    }
+                }
+
+                // Submit quantity
+                function submitQuantity() {
+                    const quantityInput = document.getElementById('quantityInput');
+                    const quantity = parseInt(quantityInput.value);
+                    
+                    if (isNaN(quantity) || quantity < 50 || quantity > 25000) {
+                        addMessage('⚠️ Пожалуйста, введите число от 50 до 25000');
+                        return;
+                    }
+                    
+                    state.quantity = quantity;
+                    
+                    if (state.recipientType === 'buy_self') {
+                        if (!confirm("У вас установлен Telegram username?")) {
+                            addMessage(`
+                                ❌ Для покупки звёзд себе требуется Telegram username!<br><br>
+                                Как установить:<br>
+                                1. Откройте <strong>Настройки</strong><br>
+                                2. Выберите <strong>Изменить профиль</strong><br>
+                                3. Установите <strong>Username</strong><br><br>
+                                После этого повторите попытку
+                            `);
+                            state.current = 'start';
+                            document.getElementById('inputArea').innerHTML = '';
+                            return;
+                        }
+                        
+                        // Используем username из Telegram Web App, если доступен
+                        let username = localStorage.getItem('tg_username') || 'ваш_username';
+                        if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user && window.Telegram.WebApp.initDataUnsafe.user.username) {
+                            username = window.Telegram.WebApp.initDataUnsafe.user.username;
+                        }
+                        state.recipient = "@" + username;
+                        preparePayment();
+                    } else {
+                        state.current = 'friend_username';
+                        addMessage('👤 Введите Telegram username друга в формате <code>@username</code>:');
+                        
+                        document.getElementById('inputArea').innerHTML = `
+                            <div class="flex">
+                                <input type="text" id="usernameInput" placeholder="@username" class="flex-1 bg-dark/40 border border-accent/30 text-white rounded-l-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent/50">
+                                <button onclick="submitUsername()" class="bg-primary hover:bg-primary/90 text-white px-5 rounded-r-xl transition">
+                                    <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        `;
+                    }
+                }
+
+                // Submit friend username
+                function submitUsername() {
+                    const usernameInput = document.getElementById('usernameInput');
+                    const username = usernameInput.value.trim();
+                    
+                    if (!username.startsWith('@')) {
+                        addMessage('⚠️ Пожалуйста, введите username в формате <code>@username</code>');
+                        return;
+                    }
+                    
+                    state.recipient = username;
+                    preparePayment();
+                }
+
+                // Prepare payment
+                function preparePayment() {
+                    state.current = 'payment';
+                    state.memo = generateMemo();
+                    state.amount = calculatePrice(state.quantity);
+                    
+                    const paymentText = `
+                        ${state.recipientType === 'buy_self' ? '🌟 Покупка звёзд для себя' : '🎁 Подарок для друга!'}<br><br>
+                        Количество звёзд: <strong>${state.quantity} ⭐️</strong><br>
+                        Получатель: <strong>${state.recipient}</strong><br>
+                        Сумма: <strong>${state.amount} TON</strong> (с наценкой ${state.markupPercent}%)<br><br>
+                    `;
+                    
+                    addMessage(paymentText);
+                    
+                    document.getElementById('inputArea').innerHTML = `
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="resetToStart()" class="w-full bg-dark/40 hover:bg-dark/80 border border-accent/30 text-white font-medium py-3 px-4 rounded-xl flex items-center justify-center transition">
+                                <i class="fas fa-undo mr-2"></i> Назад
+                            </button>
+                            <button onclick="showPaymentDetails()" class="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-medium py-3 px-4 rounded-xl flex items-center justify-center transition transform hover:scale-[1.02]">
+                                <i class="fas fa-wallet mr-2"></i> Оплатить
+                            </button>
+                        </div>
+                    `;
+                }
+
+                // Show payment details in chat
+                function showPaymentDetails() {
+                    const paymentAmount = state.amount;
+                    const paymentMemo = state.memo;
+                    const walletAddress = "UQDNP3f2o8ouV6tm17QWpbowXcKNEmKoJ4im-cuIx1nN4snB";
+                    const paymentLink = `https://app.tonkeeper.com/transfer/${walletAddress}?amount=${parseInt(parseFloat(paymentAmount)*1000000000)}&text=${paymentMemo}`;
+                    
+                    const title = state.recipientType === 'buy_self' 
+                        ? '🛒 Покупка звёзд для себя' 
+                        : '🎁 Подарок для друга!';
+                    
+                    const paymentDetails = `
+                        ${title}<br><br>
+                        🔹 <strong>Получатель:</strong> <code>${state.recipient}</code><br>
+                        🔹 <strong>Количество звёзд:</strong> ${state.quantity} ⭐️<br>
+                        🔹 <strong>Срок действия:</strong> 10 минут ⏳<br><br>
+                        💳 <strong>Реквизиты для оплаты:</strong><br><br>
+                        Сеть: TON<br>
+                        Сумма: <code>${paymentAmount}</code> TON<br>
+                        Адрес: <code id="walletAddress">${walletAddress}</code><br>
+                        <button class="text-accent text-sm mt-2 inline-block" onclick="copyToClipboard('walletAddress')">Копировать адрес</button><br><br>
+                        Добавьте в коммент (memo) к транзакции: <code id="paymentMemo">${paymentMemo}</code><br>
+                        <button class="text-accent text-sm mt-2 inline-block" onclick="copyToClipboard('paymentMemo')">Копировать memo</button><br><br>
+                        ⚠️ <strong>${state.recipientType === 'buy_self' ? 'Внимание!' : 'Важно!'}</strong><br>
+                        1. Отправьте <strong>точную</strong> сумму на указанный адрес.<br>
+                        2. Обязательно указывайте комментарий при переводе, иначе платеж НЕ ЗАСЧИТАЕТСЯ.<br>
+                        3. Проверка оплаты происходит автоматически.<br><br>
+                        👷‍♂️ В случае возникновения проблем, обращайтесь в поддержку.<br><br>
+                        <div class="flex justify-center mb-4">
+                            <canvas id="qrCode" class="qr-code"></canvas>
+                        </div>
+                        <a href="${paymentLink}" class="block bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-medium py-3 px-4 rounded-xl text-center transition transform hover:scale-[1.02] mt-4">
+                            <i class="fas fa-wallet mr-2"></i>Оплатить через Tonkeeper
+                        </a>
+                    `;
+                    
+                    addMessage(paymentDetails);
+                    
+                    // Генерация QR-кода после добавления сообщения
+                    setTimeout(() => {
+                        const qrElement = document.querySelector('#messages .chat-bubble:last-child #qrCode');
+                        if (qrElement) {
+                            generateQRCode(paymentLink, qrElement.id);
+                        }
+                    }, 1100);
+                }
+
+                // Close payment modal
+                function closePaymentModal() {
+                    document.getElementById('paymentModal')?.classList.add('hidden');
+                }
+
+                // Submit markup percent
+                function submitMarkupPercent() {
+                    const percentInput = document.getElementById('percentInput');
+                    const newPercent = parseFloat(percentInput.value);
+                    
+                    if (isNaN(newPercent) || newPercent < 0) {
+                        addMessage('⚠️ Пожалуйста, введите положительное число');
+                        return;
+                    }
+                    
+                    state.markupPercent = newPercent;
+                    addMessage(`✅ Процент наценки успешно изменён на <strong>${newPercent}%</strong>`);
+                    
+                    document.getElementById('inputArea').innerHTML = '';
+                    
+                    // Show admin menu again
+                    document.getElementById('actionButtons').innerHTML = `
+                        <button onclick="selectOption('change_markup')" class="bg-gradient-to-r from-primary to-primary/90 hover:from-primary/80 hover:to-primary/70 text-white py-4 px-4 rounded-xl flex flex-col items-center justify-center transition transform hover:scale-[1.02] shadow-lg">
+                            <div class="w-12 h-12 rounded-full bg-light/10 flex items-center justify-center mb-2">
+                                <i class="fas fa-percent text-2xl"></i>
+                            </div>
+                            <span class="font-medium">Изменить наценку</span>
+                        </button>
+                    `;
+                }
+
+                // Copy to clipboard
+                function copyToClipboard(elementId) {
+                    const text = document.getElementById(elementId).innerText;
+                    navigator.clipboard.writeText(text)
+                        .then(() => {
+                            const originalText = document.querySelector(`#${elementId} + button`).innerText;
+                            document.querySelector(`#${elementId} + button`).innerText = 'Скопировано!';
+                            
+                            setTimeout(() => {
+                                document.querySelector(`#${elementId} + button`).innerText = originalText;
+                            }, 2000);
+                        });
+                }
+
+                // Reset to start
+                function resetToStart() {
+                    state.current = 'start';
+                    state.recipientType = '';
+                    state.quantity = 0;
+                    state.recipient = '';
+                    
+                    document.getElementById('actionButtons').innerHTML = `
+                        <button onclick="selectOption('buy_self')" class="option-btn bg-gradient-to-r from-primary to-primary/90 hover:from-primary/80 hover:to-primary/70 text-white py-4 px-4 rounded-xl flex flex-col items-center justify-center transition transform hover:scale-[1.02] shadow-lg">
+                            <div class="w-12 h-12 rounded-full bg-light/10 flex items-center justify-center mb-2">
+                                <i class="fas fa-user text-2xl"></i>
+                            </div>
+                            <span class="font-medium">Купить себе</span>
+                        </button>
+                        <button onclick="selectOption('buy_friend')" class="option-btn bg-gradient-to-r from-secondary to-secondary/90 hover:from-secondary/80 hover:to-secondary/70 text-white py-4 px-4 rounded-xl flex flex-col items-center justify-center transition transform hover:scale-[1.02] shadow-lg">
+                            <div class="w-12 h-12 rounded-full bg-light/10 flex items-center justify-center mb-2">
+                                <i class="fas fa-gift text-2xl"></i>
+                            </div>
+                            <span class="font-medium">Купить другу</span>
+                        </button>
+                    `;
+                    
+                    document.getElementById('inputArea').innerHTML = '';
+                }
+
+                // Admin mode toggle
+                document.getElementById('adminBtn').addEventListener('click', function() {
+                    state.isAdmin = !state.isAdmin;
+                    if (state.isAdmin) {
+                        this.innerHTML = '<i class="fas fa-user mr-2"></i>Обычный режим';
+                        this.classList.add('bg-accent/20');
+                        selectOption('admin_menu');
+                    } else {
+                        this.innerHTML = '<i class="fas fa-user-shield mr-2"></i>Админ';
+                        this.classList.remove('bg-accent/20');
+                        resetToStart();
+                    }
+                });
+            </script>
+        </body>
+        </html>
