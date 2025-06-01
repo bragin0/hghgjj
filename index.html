@@ -246,26 +246,26 @@
 
         // Telegram Web App initialization
         window.addEventListener('load', function() {
-            if (window.Telegram?.WebApp) {
-                Telegram.WebApp.ready();
-                const user = Telegram.WebApp.initDataUnsafe.user;
-                if (user) {
-                    state.user.id = user.id;
-                    state.user.username = user.username || '';
-                    state.user.photoUrl = user.photo_url || '';
-                    
-                    // Update header with user info
-                    document.getElementById('username').textContent = state.user.username ? `@${state.user.username}` : 'Аноним';
-                    if (state.user.photoUrl) {
-                        const avatar = document.getElementById('userAvatar');
-                        avatar.src = state.user.photoUrl;
-                        avatar.classList.remove('hidden');
-                        document.getElementById('userAvatarPlaceholder').classList.add('hidden');
-                    }
-                    
-                    // Store username
-                    localStorage.setItem('tg_username', state.user.username);
+        if (window.Telegram?.WebApp) {
+            Telegram.WebApp.ready();
+            const user = Telegram.WebApp.initDataUnsafe.user;
+            if (user) {
+                state.user.id = user.id;
+                state.user.username = user.username || '';
+                state.user.photoUrl = user.photo_url || '';
+                
+                // Update header with user info
+                document.getElementById('username').textContent = state.user.username ? `@${state.user.username}` : 'Аноним';
+                if (state.user.photoUrl) {
+                    const avatar = document.getElementById('userAvatar');
+                    avatar.src = state.user.photoUrl;
+                    avatar.classList.remove('hidden');
+                    document.getElementById('userAvatarPlaceholder').classList.add('hidden');
                 }
+                
+                // Store username
+                localStorage.setItem('tg_username', state.user.username);
+            }
             }
             
             const messagesContainer = document.getElementById('messages');
