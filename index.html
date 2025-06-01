@@ -2,9 +2,9 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StarsBot - Купить Telegram Stars</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -24,26 +24,11 @@
         }
     </script>
 <style>
-    /* Стили остаются без изменений */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
     body {
         font-family: 'Inter', sans-serif;
         min-height: 100vh;
         position: relative;
-        overflow-y: auto; /* Разрешить прокрутку только по необходимости */
-    }
-    html, body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    }
-
-    .min-h-screen {
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        position: relative;
-        overflow: hidden; /* Предотвратить прокрутку за пределы контейнера */
     }
     body.stars-bg {
         background: #1E1B4B;
@@ -54,7 +39,7 @@
         background-repeat: no-repeat, repeat;
     }
     .message-container {
-        height: calc(100vh - 350px);
+        height: calc(100vh - 400px);
         scroll-behavior: smooth;
     }
     .chat-bubble {
@@ -96,9 +81,6 @@
         transform: rotate(180deg);
         z-index: 0;
     }
-
-
-
     .wave svg {
         position: relative;
         display: block;
@@ -237,12 +219,7 @@
                 <!-- Input area -->
                 <div class="bg-dark/60 border border-accent/30 rounded-xl p-4 backdrop-blur-sm">
                     <div id="inputArea">
-                        <div class="flex">
-                            <input type="text" id="commandInput" placeholder="Введите команду (например: /procent)" class="flex-1 bg-dark/40 border border-accent/30 text-white rounded-l-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent/50">
-                            <button onclick="submitCommand()" class="bg-primary hover:bg-primary/90 text-white px-5 rounded-r-xl transition">
-                                <i class="fas fa-arrow-right"></i>
-                            </button>
-                        </div>
+                        
                     </div>
                 </div>
             </div>
@@ -267,36 +244,18 @@
             }
         };
 
-        // Слушаем фокус и потерю фокуса на полях ввода
-        document.addEventListener('focusin', (e) => {
-            if (e.target.tagName === 'INPUT') {
-                document.querySelector('.wave').classList.add('input-active');
-            }
-        });
-
-        document.addEventListener('focusout', (e) => {
-            if (e.target.tagName === 'INPUT') {
-                document.querySelector('.wave').classList.remove('input-active');
-            }
-        });
-        Telegram.WebApp.onEvent('viewportChanged', (isStateStable) => {
-        if (isStateStable) {
-            document.querySelector('.wave').classList.remove('input-active');
-        }
-        });
         // Telegram Web App initialization
         window.addEventListener('load', function() {
             if (window.Telegram?.WebApp) {
                 Telegram.WebApp.ready();
-                Telegram.WebApp.expand(); // Развернуть приложение на полный экран
                 const user = Telegram.WebApp.initDataUnsafe.user;
                 if (user) {
                     state.user.id = user.id;
-                    state.user.username = user.username || `user${user.id}`;
+                    state.user.username = user.username || '';
                     state.user.photoUrl = user.photo_url || '';
                     
                     // Update header with user info
-                    document.getElementById('username').textContent = `@${state.user.username}`;
+                    document.getElementById('username').textContent = state.user.username ? `@${state.user.username}` : 'Аноним';
                     if (state.user.photoUrl) {
                         const avatar = document.getElementById('userAvatar');
                         avatar.src = state.user.photoUrl;
@@ -392,17 +351,30 @@
 
         // Generate QR code
         function generateQRCode(text, elementId) {
+            console.log('Generating QR code for:', text, 'Element ID:', elementId);
             const qrElement = document.getElementById(elementId);
-            qrElement.innerHTML = '';
-            QRCode.toCanvas(qrElement, text, {
-                width: 250,
-                height: 250,
-                margin: 0,
-                color: {
-                    dark: '#1E1B4B',
-                    light: '#FFFFFF'
-                }
-            });
+            if (qrElement) {
+                qrElement.innerHTML = '';
+                QRCode.toCanvas(qrElement, text, {
+                    width: 250,
+                    height: 250,
+                    margin: 0,
+                    color: {
+                        dark: '#1E1B4B',
+                        light: '#FFFFFF'
+                    }
+                }, function(error) {
+                    if (error) {
+                        console.error('QR Code generation error:', error);
+                        addMessage('⚠️ Ошибка при генерации QR-кода. Пожалуйста, попробуйте снова.');
+                    } else {
+                        console.log('QR Code generated successfully');
+                    }
+                });
+            } else {
+                console.error('QR Code element not found:', elementId);
+                addMessage('⚠️ Не удалось найти элемент для QR-кода. Пожалуйста, попробуйте снова.');
+            }
         }
 
         // Calculate stars price
@@ -418,10 +390,10 @@
             const command = commandInput.value.trim();
             addMessage(command, true);
             
-            if (command.toLowerCase() === '/procent') {
+            if (command.toLowerCase() === '/admin') {
                 selectOption('admin_menu');
             } else {
-                addMessage('Неизвестная команда. Доступные команды: /procent');
+                addMessage('Неизвестная команда. Доступные команды: /admin');
             }
             
             commandInput.value = '';
@@ -436,7 +408,7 @@
                     ? "🌟 Купить звёзды себе<br><br>Введите количество звёзд (от 50 до 25000):" 
                     : "🎁 Купить звёзды другу<br><br>Введите количество звёзд (от 50 до 25000):");
                 
-                // Скрыть кнопки
+                // Очищаем кнопки
                 document.getElementById('actionButtons').innerHTML = '';
                 
                 document.getElementById('inputArea').innerHTML = `
@@ -459,14 +431,6 @@
                         </div>
                         <span class="font-medium">Изменить наценку</span>
                     </button>
-                `;
-                document.getElementById('inputArea').innerHTML = `
-                    <div class="flex">
-                        <input type="text" id="commandInput" placeholder="Введите команду (например: /procent)" class="flex-1 bg-dark/40 border border-accent/30 text-white rounded-l-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent/50">
-                        <button onclick="submitCommand()" class="bg-primary hover:bg-primary/90 text-white px-5 rounded-r-xl transition">
-                            <i class="fas fa-arrow-right"></i>
-                        </button>
-                    </div>
                 `;
             } else if (option === 'change_markup') {
                 state.current = 'markup_percent';
@@ -497,31 +461,24 @@
             
             if (state.recipientType === 'buy_self') {
                 if (!state.user.username) {
-                    addMessage(`
-                        ❌ Для покупки звёзд себе требуется Telegram username!<br><br>
-                        Как установить:<br>
-                        1. Откройте <strong>Настройки</strong><br>
-                        2. Выберите <strong>Изменить профиль</strong><br>
-                        3. Установите <strong>Username</strong><br><br>
-                        После этого повторите попытку
-                    `);
-                    state.current = 'start';
+                    state.current = 'self_username';
+                    addMessage('👤 Введите ваш Telegram username в формате <code>@username</code> (username не должен начинаться с цифры):');
+                    
                     document.getElementById('inputArea').innerHTML = `
                         <div class="flex">
-                            <input type="text" id="commandInput" placeholder="Введите команду (например: /procent)" class="flex-1 bg-dark/40 border border-accent/30 text-white rounded-l-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent/50">
-                            <button onclick="submitCommand()" class="bg-primary hover:bg-primary/90 text-white px-5 rounded-r-xl transition">
+                            <input type="text" id="usernameInput" placeholder="@username" class="flex-1 bg-dark/40 border border-accent/30 text-white rounded-l-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent/50">
+                            <button onclick="submitUsername()" class="bg-primary hover:bg-primary/90 text-white px-5 rounded-r-xl transition">
                                 <i class="fas fa-arrow-right"></i>
                             </button>
                         </div>
                     `;
-                    return;
+                } else {
+                    state.recipient = `@${state.user.username}`;
+                    preparePayment();
                 }
-                
-                state.recipient = `@${state.user.username}`;
-                preparePayment();
             } else {
                 state.current = 'friend_username';
-                addMessage('👤 Введите Telegram username друга в формате <code>@username</code>:');
+                addMessage('👤 Введите Telegram username друга в формате <code>@username</code> (username не должен начинаться с цифры):');
                 
                 document.getElementById('inputArea').innerHTML = `
                     <div class="flex">
@@ -534,7 +491,7 @@
             }
         }
 
-        // Submit friend username
+        // Submit friend or self username
         function submitUsername() {
             const usernameInput = document.getElementById('usernameInput');
             const username = usernameInput.value.trim();
@@ -544,7 +501,18 @@
                 return;
             }
             
+            const usernameWithoutAt = username.substring(1);
+            if (!usernameWithoutAt || /^\d/.test(usernameWithoutAt)) {
+                addMessage('⚠️ Username не должен начинаться с цифры и не может быть пустым');
+                return;
+            }
+            
             state.recipient = username;
+            if (state.recipientType === 'buy_self') {
+                state.user.username = usernameWithoutAt;
+                localStorage.setItem('tg_username', usernameWithoutAt);
+                document.getElementById('username').textContent = `@${state.user.username}`;
+            }
             preparePayment();
         }
 
@@ -553,6 +521,8 @@
             state.current = 'payment';
             state.memo = generateMemo();
             state.amount = calculatePrice(state.quantity);
+            
+            console.log('Preparing payment:', { quantity: state.quantity, recipient: state.recipient, amount: state.amount, memo: state.memo });
             
             const paymentText = `
                 ${state.recipientType === 'buy_self' ? '🌟 Покупка звёзд для себя' : '🎁 Подарок для друга!'}<br><br>
@@ -582,9 +552,14 @@
             const walletAddress = "UQDNP3f2o8ouV6tm17QWpbowXcKNEmKoJ4im-cuIx1nN4snB";
             const paymentLink = `https://app.tonkeeper.com/transfer/${walletAddress}?amount=${parseInt(parseFloat(paymentAmount)*1000000000)}&text=${paymentMemo}`;
             
+            console.log('Payment details:', { paymentAmount, paymentMemo, walletAddress, paymentLink });
+            
             const title = state.recipientType === 'buy_self' 
                 ? '🛒 Покупка звёзд для себя' 
                 : '🎁 Подарок для друга!';
+            
+            // Уникальный ID для QR-кода
+            const qrCodeId = `qrCode_${Date.now()}`;
             
             const paymentDetails = `
                 ${title}<br><br>
@@ -604,7 +579,7 @@
                 3. Проверка оплаты происходит автоматически.<br><br>
                 👷‍♂️ В случае возникновения проблем, обращайтесь в поддержку.<br><br>
                 <div class="flex justify-center mb-4">
-                    <canvas id="qrCode" class="qr-code"></canvas>
+                    <canvas id="${qrCodeId}" class="qr-code"></canvas>
                 </div>
                 <a href="${paymentLink}" class="block bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-medium py-3 px-4 rounded-xl text-center transition transform hover:scale-[1.02] mt-4">
                     <i class="fas fa-wallet mr-2"></i>Оплатить через Tonkeeper
@@ -613,12 +588,16 @@
             
             addMessage(paymentDetails);
             
+            // Увеличим задержку для гарантии рендеринга DOM
             setTimeout(() => {
-                const qrElement = document.querySelector('#messages .chat-bubble:last-child #qrCode');
+                const qrElement = document.getElementById(qrCodeId);
                 if (qrElement) {
-                    generateQRCode(paymentLink, qrElement.id);
+                    generateQRCode(paymentLink, qrCodeId);
+                } else {
+                    console.error('QR Code element not found:', qrCodeId);
+                    addMessage('⚠️ Не удалось найти элемент для QR-кода. Пожалуйста, попробуйте снова.');
                 }
-            }, 1100);
+            }, 2000); // Увеличена задержка до 2000 мс
         }
 
         // Submit markup percent
@@ -636,7 +615,7 @@
             
             document.getElementById('inputArea').innerHTML = `
                 <div class="flex">
-                    <input type="text" id="commandInput" placeholder="Введите команду (например: /procent)" class="flex-1 bg-dark/40 border border-accent/30 text-white rounded-l-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent/50">
+                    <input type="text" id="commandInput" placeholder="Введите команду (например: /admin)" class="flex-1 bg-dark/40 border border-accent/30 text-white rounded-l-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent/50">
                     <button onclick="submitCommand()" class="bg-primary hover:bg-primary/90 text-white px-5 rounded-r-xl transition">
                         <i class="fas fa-arrow-right"></i>
                     </button>
@@ -691,7 +670,7 @@
             
             document.getElementById('inputArea').innerHTML = `
                 <div class="flex">
-                    <input type="text" id="commandInput" placeholder="Введите команду (например: /procent)" class="flex-1 bg-dark/40 border border-accent/30 text-white rounded-l-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent/50">
+                    <input type="text" id="commandInput" placeholder="Введите команду (например: /admin)" class="flex-1 bg-dark/40 border border-accent/30 text-white rounded-l-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent/50">
                     <button onclick="submitCommand()" class="bg-primary hover:bg-primary/90 text-white px-5 rounded-r-xl transition">
                         <i class="fas fa-arrow-right"></i>
                     </button>
