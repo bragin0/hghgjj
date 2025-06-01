@@ -579,7 +579,12 @@ function selectOption(option) {
             addMessage(`✅ Процент наценки успешно изменён на <strong>${newPercent}%</strong>`);
             
             document.getElementById('inputArea').innerHTML = `
-
+                <div class="flex">
+                    
+                    <button onclick="submitCommand()" class="bg-primary hover:bg-primary/90 text-white px-5 rounded-r-xl transition">
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
             `;
             
             // Show admin menu again
@@ -629,7 +634,12 @@ function selectOption(option) {
             `;
             
             document.getElementById('inputArea').innerHTML = `
-
+                <div class="flex">
+                    
+                    <button onclick="submitCommand()" class="bg-primary hover:bg-primary/90 text-white px-5 rounded-r-xl transition">
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
             `;
         }
     </script>
