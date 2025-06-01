@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>StarsBot - Купить Telegram Stars</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -28,7 +28,22 @@
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
     body {
         font-family: 'Inter', sans-serif;
+        min-height: 100vh;
         position: relative;
+        overflow-y: auto; /* Разрешить прокрутку только по необходимости */
+    }
+    html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    }
+
+    .min-h-screen {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow: hidden; /* Предотвратить прокрутку за пределы контейнера */
     }
     body.stars-bg {
         background: #1E1B4B;
@@ -81,6 +96,9 @@
         transform: rotate(180deg);
         z-index: 0;
     }
+
+
+
     .wave svg {
         position: relative;
         display: block;
@@ -249,10 +267,28 @@
             }
         };
 
+        // Слушаем фокус и потерю фокуса на полях ввода
+        document.addEventListener('focusin', (e) => {
+            if (e.target.tagName === 'INPUT') {
+                document.querySelector('.wave').classList.add('input-active');
+            }
+        });
+
+        document.addEventListener('focusout', (e) => {
+            if (e.target.tagName === 'INPUT') {
+                document.querySelector('.wave').classList.remove('input-active');
+            }
+        });
+        Telegram.WebApp.onEvent('viewportChanged', (isStateStable) => {
+        if (isStateStable) {
+            document.querySelector('.wave').classList.remove('input-active');
+        }
+        });
         // Telegram Web App initialization
         window.addEventListener('load', function() {
             if (window.Telegram?.WebApp) {
                 Telegram.WebApp.ready();
+                Telegram.WebApp.expand(); // Развернуть приложение на полный экран
                 const user = Telegram.WebApp.initDataUnsafe.user;
                 if (user) {
                     state.user.id = user.id;
@@ -399,6 +435,9 @@
                 addMessage(option === 'buy_self' 
                     ? "🌟 Купить звёзды себе<br><br>Введите количество звёзд (от 50 до 25000):" 
                     : "🎁 Купить звёзды другу<br><br>Введите количество звёзд (от 50 до 25000):");
+                
+                // Скрыть кнопки
+                document.getElementById('actionButtons').innerHTML = '';
                 
                 document.getElementById('inputArea').innerHTML = `
                     <div class="flex">
