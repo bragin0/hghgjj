@@ -29,8 +29,6 @@
             --vh: 1vh;
         }
         html, body {
-            margin: 0;
-            padding: 0;
             height: 100%;
             overflow: hidden;
         }
@@ -47,11 +45,8 @@
             background-repeat: no-repeat, repeat;
         }
         .app-container {
-            height: calc(var(--vh, 1vh) * 100);
-            display: flex;
-            flex-direction: column;
+            height: 100%;
             overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
         }
         .message-container {
             flex: 1;
