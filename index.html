@@ -246,26 +246,26 @@
 
         // Telegram Web App initialization
         window.addEventListener('load', function() {
-        if (window.Telegram?.WebApp) {
-            Telegram.WebApp.ready();
-            const user = Telegram.WebApp.initDataUnsafe.user;
-            if (user) {
-                state.user.id = user.id;
-                state.user.username = user.username || '';
-                state.user.photoUrl = user.photo_url || '';
-                
-                // Update header with user info
-                document.getElementById('username').textContent = state.user.username ? `@${state.user.username}` : 'Аноним';
-                if (state.user.photoUrl) {
-                    const avatar = document.getElementById('userAvatar');
-                    avatar.src = state.user.photoUrl;
-                    avatar.classList.remove('hidden');
-                    document.getElementById('userAvatarPlaceholder').classList.add('hidden');
+            if (window.Telegram?.WebApp) {
+                Telegram.WebApp.ready();
+                const user = Telegram.WebApp.initDataUnsafe.user;
+                if (user) {
+                    state.user.id = user.id;
+                    state.user.username = user.username || '';
+                    state.user.photoUrl = user.photo_url || '';
+                    
+                    // Update header with user info
+                    document.getElementById('username').textContent = state.user.username ? `@${state.user.username}` : 'Аноним';
+                    if (state.user.photoUrl) {
+                        const avatar = document.getElementById('userAvatar');
+                        avatar.src = state.user.photoUrl;
+                        avatar.classList.remove('hidden');
+                        document.getElementById('userAvatarPlaceholder').classList.add('hidden');
+                    }
+                    
+                    // Store username
+                    localStorage.setItem('tg_username', state.user.username);
                 }
-                
-                // Store username
-                localStorage.setItem('tg_username', state.user.username);
-            }
             }
             
             const messagesContainer = document.getElementById('messages');
@@ -351,30 +351,17 @@
 
         // Generate QR code
         function generateQRCode(text, elementId) {
-            console.log('Generating QR code for:', text, 'Element ID:', elementId);
             const qrElement = document.getElementById(elementId);
-            if (qrElement) {
-                qrElement.innerHTML = '';
-                QRCode.toCanvas(qrElement, text, {
-                    width: 250,
-                    height: 250,
-                    margin: 0,
-                    color: {
-                        dark: '#1E1B4B',
-                        light: '#FFFFFF'
-                    }
-                }, function(error) {
-                    if (error) {
-                        console.error('QR Code generation error:', error);
-                        addMessage('⚠️ Ошибка при генерации QR-кода. Пожалуйста, попробуйте снова.');
-                    } else {
-                        console.log('QR Code generated successfully');
-                    }
-                });
-            } else {
-                console.error('QR Code element not found:', elementId);
-                addMessage('⚠️ Не удалось найти элемент для QR-кода. Пожалуйста, попробуйте снова.');
-            }
+            qrElement.innerHTML = '';
+            QRCode.toCanvas(qrElement, text, {
+                width: 250,
+                height: 250,
+                margin: 0,
+                color: {
+                    dark: '#1E1B4B',
+                    light: '#FFFFFF'
+                }
+            });
         }
 
         // Calculate stars price
@@ -522,8 +509,6 @@
             state.memo = generateMemo();
             state.amount = calculatePrice(state.quantity);
             
-            console.log('Preparing payment:', { quantity: state.quantity, recipient: state.recipient, amount: state.amount, memo: state.memo });
-            
             const paymentText = `
                 ${state.recipientType === 'buy_self' ? '🌟 Покупка звёзд для себя' : '🎁 Подарок для друга!'}<br><br>
                 Количество звёзд: <strong>${state.quantity} ⭐️</strong><br>
@@ -552,14 +537,9 @@
             const walletAddress = "UQDNP3f2o8ouV6tm17QWpbowXcKNEmKoJ4im-cuIx1nN4snB";
             const paymentLink = `https://app.tonkeeper.com/transfer/${walletAddress}?amount=${parseInt(parseFloat(paymentAmount)*1000000000)}&text=${paymentMemo}`;
             
-            console.log('Payment details:', { paymentAmount, paymentMemo, walletAddress, paymentLink });
-            
             const title = state.recipientType === 'buy_self' 
                 ? '🛒 Покупка звёзд для себя' 
                 : '🎁 Подарок для друга!';
-            
-            // Уникальный ID для QR-кода
-            const qrCodeId = `qrCode_${Date.now()}`;
             
             const paymentDetails = `
                 ${title}<br><br>
@@ -579,7 +559,7 @@
                 3. Проверка оплаты происходит автоматически.<br><br>
                 👷‍♂️ В случае возникновения проблем, обращайтесь в поддержку.<br><br>
                 <div class="flex justify-center mb-4">
-                    <canvas id="${qrCodeId}" class="qr-code"></canvas>
+                    <canvas id="qrCode" class="qr-code"></canvas>
                 </div>
                 <a href="${paymentLink}" class="block bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-medium py-3 px-4 rounded-xl text-center transition transform hover:scale-[1.02] mt-4">
                     <i class="fas fa-wallet mr-2"></i>Оплатить через Tonkeeper
@@ -588,16 +568,12 @@
             
             addMessage(paymentDetails);
             
-            // Увеличим задержку для гарантии рендеринга DOM
             setTimeout(() => {
-                const qrElement = document.getElementById(qrCodeId);
+                const qrElement = document.querySelector('#messages .chat-bubble:last-child #qrCode');
                 if (qrElement) {
-                    generateQRCode(paymentLink, qrCodeId);
-                } else {
-                    console.error('QR Code element not found:', qrCodeId);
-                    addMessage('⚠️ Не удалось найти элемент для QR-кода. Пожалуйста, попробуйте снова.');
+                    generateQRCode(paymentLink, qrElement.id);
                 }
-            }, 2000); // Увеличена задержка до 2000 мс
+            }, 1100);
         }
 
         // Submit markup percent
@@ -669,12 +645,7 @@
             `;
             
             document.getElementById('inputArea').innerHTML = `
-                <div class="flex">
-                    <input type="text" id="commandInput" placeholder="Введите команду (например: /admin)" class="flex-1 bg-dark/40 border border-accent/30 text-white rounded-l-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent/50">
-                    <button onclick="submitCommand()" class="bg-primary hover:bg-primary/90 text-white px-5 rounded-r-xl transition">
-                        <i class="fas fa-arrow-right"></i>
-                    </button>
-                </div>
+
             `;
         }
     </script>
