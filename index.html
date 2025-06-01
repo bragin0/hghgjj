@@ -24,6 +24,7 @@
         }
     </script>
 <style>
+    /* Стили остаются без изменений */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
     body {
         font-family: 'Inter', sans-serif;
@@ -217,10 +218,11 @@
                 </div>
                 
                 <!-- Input area -->
-                <div class="bg-dark/60 border border-accent/30 rounded-xl p-4 backdrop-blur-sm">
+<div class="bg-dark/60 border border-accent/30 rounded-xl p-4 backdrop-blur-sm">
                     <div id="inputArea">
                         
                     </div>
+                </div>
                 </div>
             </div>
         </main>
@@ -251,11 +253,11 @@
                 const user = Telegram.WebApp.initDataUnsafe.user;
                 if (user) {
                     state.user.id = user.id;
-                    state.user.username = user.username || '';
+                    state.user.username = user.username || `user${user.id}`;
                     state.user.photoUrl = user.photo_url || '';
                     
                     // Update header with user info
-                    document.getElementById('username').textContent = state.user.username ? `@${state.user.username}` : 'Аноним';
+                    document.getElementById('username').textContent = `@${state.user.username}`;
                     if (state.user.photoUrl) {
                         const avatar = document.getElementById('userAvatar');
                         avatar.src = state.user.photoUrl;
@@ -386,53 +388,53 @@
             commandInput.value = '';
         }
 
-        // Handle option selection
-        function selectOption(option) {
-            if (option === 'buy_self' || option === 'buy_friend') {
-                state.recipientType = option;
-                state.current = 'quantity';
-                addMessage(option === 'buy_self' 
-                    ? "🌟 Купить звёзды себе<br><br>Введите количество звёзд (от 50 до 25000):" 
-                    : "🎁 Купить звёзды другу<br><br>Введите количество звёзд (от 50 до 25000):");
-                
-                // Очищаем кнопки
-                document.getElementById('actionButtons').innerHTML = '';
-                
-                document.getElementById('inputArea').innerHTML = `
-                    <div class="flex">
-                        <input type="number" id="quantityInput" min="50" max="25000" placeholder="Например: 500" class="flex-1 bg-dark/40 border border-accent/30 text-white rounded-l-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent/50">
-                        <button onclick="submitQuantity()" class="bg-primary hover:bg-primary/90 text-white px-5 rounded-r-xl transition">
-                            <i class="fas fa-arrow-right"></i>
-                        </button>
-                    </div>
-                `;
-            } else if (option === 'admin_menu') {
-                state.isAdmin = true;
-                state.current = 'admin_menu';
-                addMessage(`👨‍💼 Админ-панель<br><br>Текущий процент наценки: <strong>${state.markupPercent}%</strong><br>Выберите действие:`);
-                
-                document.getElementById('actionButtons').innerHTML = `
-                    <button onclick="selectOption('change_markup')" class="bg-gradient-to-r from-primary to-primary/90 hover:from-primary/80 hover:to-primary/70 text-white py-4 px-4 rounded-xl flex flex-col items-center justify-center transition transform hover:scale-[1.02] shadow-lg">
-                        <div class="w-12 h-12 rounded-full bg-light/10 flex items-center justify-center mb-2">
-                            <i class="fas fa-percent text-2xl"></i>
-                        </div>
-                        <span class="font-medium">Изменить наценку</span>
-                    </button>
-                `;
-            } else if (option === 'change_markup') {
-                state.current = 'markup_percent';
-                addMessage(`📈 Изменение процента наценки<br><br>Текущий процент: <strong>${state.markupPercent}%</strong><br>Введите новый процент (например: <code>30</code> для 30%):`);
-                
-                document.getElementById('inputArea').innerHTML = `
-                    <div class="flex">
-                        <input type="number" id="percentInput" min="0" step="1" placeholder="Введите новый процент" class="flex-1 bg-dark/40 border border-accent/30 text-white rounded-l-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent/50">
-                        <button onclick="submitMarkupPercent()" class="bg-primary hover:bg-primary/90 text-white px-5 rounded-r-xl transition">
-                            <i class="fas fa-check"></i>
-                        </button>
-                    </div>
-                `;
-            }
-        }
+// Handle option selection
+function selectOption(option) {
+    if (option === 'buy_self' || option === 'buy_friend') {
+        state.recipientType = option;
+        state.current = 'quantity';
+        addMessage(option === 'buy_self' 
+            ? "🌟 Купить звёзды себе<br><br>Введите количество звёзд (от 50 до 25000):" 
+            : "🎁 Купить звёзды другу<br><br>Введите количество звёзд (от 50 до 25000):");
+        
+        // Очищаем кнопки
+        document.getElementById('actionButtons').innerHTML = '';
+        
+        document.getElementById('inputArea').innerHTML = `
+            <div class="flex">
+                <input type="number" id="quantityInput" min="50" max="25000" placeholder="Например: 500" class="flex-1 bg-dark/40 border border-accent/30 text-white rounded-l-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent/50">
+                <button onclick="submitQuantity()" class="bg-primary hover:bg-primary/90 text-white px-5 rounded-r-xl transition">
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        `;
+    } else if (option === 'admin_menu') {
+        state.isAdmin = true;
+        state.current = 'admin_menu';
+        addMessage(`👨‍💼 Админ-панель<br><br>Текущий процент наценки: <strong>${state.markupPercent}%</strong><br>Выберите действие:`);
+        
+        document.getElementById('actionButtons').innerHTML = `
+            <button onclick="selectOption('change_markup')" class="bg-gradient-to-r from-primary to-primary/90 hover:from-primary/80 hover:to-primary/70 text-white py-4 px-4 rounded-xl flex flex-col items-center justify-center transition transform hover:scale-[1.02] shadow-lg">
+                <div class="w-12 h-12 rounded-full bg-light/10 flex items-center justify-center mb-2">
+                    <i class="fas fa-percent text-2xl"></i>
+                </div>
+                <span class="font-medium">Изменить наценку</span>
+            </button>
+        `;
+    } else if (option === 'change_markup') {
+        state.current = 'markup_percent';
+        addMessage(`📈 Изменение процента наценки<br><br>Текущий процент: <strong>${state.markupPercent}%</strong><br>Введите новый процент (например: <code>30</code> для 30%):`);
+        
+        document.getElementById('inputArea').innerHTML = `
+            <div class="flex">
+                <input type="number" id="percentInput" min="0" step="1" placeholder="Введите новый процент" class="flex-1 bg-dark/40 border border-accent/30 text-white rounded-l-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent/50">
+                <button onclick="submitMarkupPercent()" class="bg-primary hover:bg-primary/90 text-white px-5 rounded-r-xl transition">
+                    <i class="fas fa-check"></i>
+                </button>
+            </div>
+        `;
+    }
+}
 
         // Submit quantity
         function submitQuantity() {
@@ -448,24 +450,22 @@
             
             if (state.recipientType === 'buy_self') {
                 if (!state.user.username) {
-                    state.current = 'self_username';
-                    addMessage('👤 Введите ваш Telegram username в формате <code>@username</code> (username не должен начинаться с цифры):');
-                    
-                    document.getElementById('inputArea').innerHTML = `
-                        <div class="flex">
-                            <input type="text" id="usernameInput" placeholder="@username" class="flex-1 bg-dark/40 border border-accent/30 text-white rounded-l-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent/50">
-                            <button onclick="submitUsername()" class="bg-primary hover:bg-primary/90 text-white px-5 rounded-r-xl transition">
-                                <i class="fas fa-arrow-right"></i>
-                            </button>
-                        </div>
-                    `;
-                } else {
-                    state.recipient = `@${state.user.username}`;
-                    preparePayment();
+                    addMessage(`
+                        ❌ Для покупки звёзд себе требуется Telegram username!<br><br>
+                        Как установить:<br>
+                        1. Откройте <strong>Настройки</strong><br>
+                        2. Выберите <strong>Изменить профиль</strong><br>
+                        3. Установите <strong>Username</strong><br><br>
+                        После этого повторите попытку
+                    `);
+                    return;
                 }
+                
+                state.recipient = `@${state.user.username}`;
+                preparePayment();
             } else {
                 state.current = 'friend_username';
-                addMessage('👤 Введите Telegram username друга в формате <code>@username</code> (username не должен начинаться с цифры):');
+                addMessage('👤 Введите Telegram username друга в формате <code>@username</code>:');
                 
                 document.getElementById('inputArea').innerHTML = `
                     <div class="flex">
@@ -478,7 +478,7 @@
             }
         }
 
-        // Submit friend or self username
+        // Submit friend username
         function submitUsername() {
             const usernameInput = document.getElementById('usernameInput');
             const username = usernameInput.value.trim();
@@ -488,18 +488,7 @@
                 return;
             }
             
-            const usernameWithoutAt = username.substring(1);
-            if (!usernameWithoutAt || /^\d/.test(usernameWithoutAt)) {
-                addMessage('⚠️ Username не должен начинаться с цифры и не может быть пустым');
-                return;
-            }
-            
             state.recipient = username;
-            if (state.recipientType === 'buy_self') {
-                state.user.username = usernameWithoutAt;
-                localStorage.setItem('tg_username', usernameWithoutAt);
-                document.getElementById('username').textContent = `@${state.user.username}`;
-            }
             preparePayment();
         }
 
@@ -590,12 +579,7 @@
             addMessage(`✅ Процент наценки успешно изменён на <strong>${newPercent}%</strong>`);
             
             document.getElementById('inputArea').innerHTML = `
-                <div class="flex">
-                    <input type="text" id="commandInput" placeholder="Введите команду (например: /admin)" class="flex-1 bg-dark/40 border border-accent/30 text-white rounded-l-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent/50">
-                    <button onclick="submitCommand()" class="bg-primary hover:bg-primary/90 text-white px-5 rounded-r-xl transition">
-                        <i class="fas fa-arrow-right"></i>
-                    </button>
-                </div>
+
             `;
             
             // Show admin menu again
